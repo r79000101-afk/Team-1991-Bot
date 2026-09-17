@@ -1,10 +1,13 @@
 const { Client, GatewayIntentBits, ActivityType } = require('discord.js');
 const http = require('http');
 
+const PORT = process.env.PORT || 8080;
 http.createServer((req, res) => {
   res.write("Bot is active 24/7!");
   res.end();
-}).listen(8080);
+}).listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
+});
 
 const client = new Client({
   intents: [
