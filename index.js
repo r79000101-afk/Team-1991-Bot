@@ -5,13 +5,29 @@ const {
     ActionRowBuilder, 
     ButtonBuilder, 
     ButtonStyle, 
+    StringSelectMenuBuilder,
     PermissionsBitField 
 } = require('discord.js');
 const express = require('express');
 
 const app = express();
 
-// Discord Client Setup
+// Web dashboard & keep-alive endpoint
+app.get('/', (req, res) => {
+    res.send(`
+    <body style="background:#0b0e14;color:white;font-family:sans-serif;text-align:center;padding:50px;">
+        <h2>TEAM 1991 || OLYMPUS</h2>
+        <p>Status: <span style="color:#22c55e;">Online 24/7</span></p>
+        <p>Servers: ${client.guilds?.cache?.size || 0} | Ping: ${Math.round(client.ws?.ping) || 0}ms</p>
+    </body>
+    `);
+});
+
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT}`);
+});
+
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -22,254 +38,264 @@ const client = new Client({
     ]
 });
 
-// 1. Web Dashboard (Xieon-style Dark Theme)
-app.get('/', (req, res) => {
-    const uptimeSec = Math.floor(process.uptime());
-    const hours = Math.floor(uptimeSec / 3600);
-    const mins = Math.floor((uptimeSec % 3600) / 60);
-
-    res.send(`
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Team 1991 Dashboard</title>
-        <style>
-            * { box-sizing: border-box; margin: 0; padding: 0; }
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #0b0e14; color: #e6edf3; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-            .card { background-color: #161b22; border: 1px solid #30363d; border-radius: 14px; max-width: 520px; width: 100%; padding: 32px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
-            .badge { display: inline-flex; align-items: center; gap: 6px; background-color: rgba(35, 134, 54, 0.2); color: #3fb950; border: 1px solid #238636; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; margin-bottom: 18px; }
-            .pulse { width: 8px; height: 8px; background-color: #3fb950; border-radius: 50%; box-shadow: 0 0 8px #3fb950; }
-            h1 { font-size: 24px; margin-bottom: 8px; color: #58a6ff; }
-            p.desc { font-size: 14px; color: #8b949e; margin-bottom: 24px; }
-            .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #21262d; padding-top: 20px; }
-            .stat-box { background: #0d1117; padding: 14px 8px; border-radius: 8px; border: 1px solid #30363d; }
-            .stat-box h3 { font-size: 18px; color: #f0f6fc; }
-            .stat-box span { font-size: 12px; color: #8b949e; }
-        </style>
-    </head>
-    <body>
-        <div class="card">
-            <div class="badge"><div class="pulse"></div> Online 24/7</div>
-            <h1>Team 1991 Bot</h1>
-            <p class="desc">Advanced server protection, voice management, and moderation systems active.</p>
-            <div class="grid">
-                <div class="stat-box">
-                    <h3>${client.guilds?.cache?.size || 0}</h3>
-                    <span>Servers</span>
-                </div>
-                <div class="stat-box">
-                    <h3>${Math.round(client.ws?.ping) || 0}ms</h3>
-                    <span>Ping</span>
-                </div>
-                <div class="stat-box">
-                    <h3>${hours}h ${mins}m</h3>
-                    <span>Uptime</span>
-                </div>
-            </div>
-        </div>
-    </body>
-    </html>
-    `);
-});
-
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Web Dashboard is active on port: ${PORT}`);
-});
+const PREFIX = '$';
 
 client.once('ready', () => {
     console.log(`✅ Logged in as ${client.user.tag}!`);
 });
 
-// 2. Command Handler
-client.on('messageCreate', async (message) => {
-    if (message.author.bot || !message.content.startsWith('!')) return;
+// Helper: Main Olympus / Xieon Help Embed
+function getMainHelpEmbed(user) {
+    return new EmbedBuilder()
+        .setColor('#FF0033') // Signature red accent line
+        .setAuthor({ 
+            name: `${user.username}`, 
+            iconURL: user.displayAvatarURL({ dynamic: true }) 
+        })
+        .setDescription(`
+**Bot Overview:**
+🖊️ : Server Prefix: \`${PREFIX}\`
+🔢 : Total Commands: 455 | Slash: 54
+🔗 : [Get Olympus](https://team-1991-bot-jfya.onrender.com) | [Website](https://team-1991-bot-jfya.onrender.com)
 
-    const args = message.content.slice(1).trim().split(/ +/);
+\`\`\`
+<@${client.user.id}> help <command/module>
+for more info regarding that command/module!
+Example: <@${client.user.id}> help mute
+\`\`\`
+
+**Main Modules:**
+🛡️ : Antinuke Security
+🔒 : Anti Betray ⭐
+🔢 : Limit System ⭐
+🚨 : Auto Emergency ⭐
+❌ : Emergency
+🔨 : Moderation
+🔧 : Utility
+🛑 : Automod
+👋 : Welcoming
+⭐ : Customroles
+🎉 : Giveaway ⭐
+🚫 : Boycott/VcBan \`NEW\`
+⚙️ : Automations
+🎭 : Fun
+🔊 : Voice
+🛑 : Admin / Mod Setup
+⚙️ : Ignore Commands
+
+*Use buttons to swap pages & menu to select help pages. Need help? Contact Support.*
+        `)
+        .setFooter({ text: 'TEAM 1991 || OLYMPUS', iconURL: client.user.displayAvatarURL() });
+}
+
+// Interactive Buttons & Selection Menu
+function getHelpComponents() {
+    const rowButtons = new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId('help_first').setEmoji('⏮️').setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder().setCustomId('help_prev').setEmoji('◀️').setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder().setCustomId('help_close').setEmoji('❌').setStyle(ButtonStyle.Danger),
+        new ButtonBuilder().setCustomId('help_next').setEmoji('▶️').setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder().setCustomId('help_last').setEmoji('⏭️').setStyle(ButtonStyle.Secondary)
+    );
+
+    const rowMenu = new ActionRowBuilder().addComponents(
+        new StringSelectMenuBuilder()
+            .setCustomId('help_select')
+            .setPlaceholder('Choose a Module for Help')
+            .addOptions([
+                { label: 'Overview', value: 'mod_home', emoji: '🏠', description: 'Return to main overview' },
+                { label: 'Antinuke Security', value: 'mod_antinuke', emoji: '🛡️', description: 'Server protection setup' },
+                { label: 'Moderation', value: 'mod_moderation', emoji: '🔨', description: 'Ban, Kick, Mute, Clear, Lock' },
+                { label: 'Voice Controls', value: 'mod_voice', emoji: '🔊', description: 'Vc Kick, Vc Mute, Disconnect' },
+                { label: 'Utility', value: 'mod_utility', emoji: '🔧', description: 'Ping, Stats, Serverinfo' }
+            ])
+    );
+
+    return [rowButtons, rowMenu];
+}
+
+// Command Handler
+client.on('messageCreate', async (message) => {
+    if (message.author.bot || !message.content.startsWith(PREFIX)) return;
+
+    const args = message.content.slice(PREFIX.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
 
-    // !help command
+    // $help
     if (command === 'help') {
-        const helpEmbed = new EmbedBuilder()
-            .setColor('#5865F2')
-            .setTitle('🛡️ Team 1991 — Command Center')
-            .setDescription('**Team 1991** features advanced moderation, server security, and voice utilities.')
-            .addFields(
-                { 
-                    name: '🛡️ Security & Antinuke', 
-                    value: '`!antinuke [on/off]`, `!whitelist @user`, `!unwhitelist @user`, `!recovery`' 
-                },
-                { 
-                    name: '🔨 Moderation', 
-                    value: '`!ban @user [reason]`, `!kick @user`, `!mute @user [minutes]`, `!unmute @user`, `!clear [amount]`, `!lock`, `!unlock`' 
-                },
-                { 
-                    name: '🔊 Voice Controls', 
-                    value: '`!vckick @user`, `!vcmute @user`, `!vcunmute @user`' 
-                },
-                { 
-                    name: '⚙️ Utility & Info', 
-                    value: '`!ping`, `!botinfo`, `!serverinfo`, `!userinfo [@user]`' 
-                }
-            )
-            .setFooter({ text: 'Team 1991 Security • 24/7 Active' })
-            .setTimestamp();
-
-        const row = new ActionRowBuilder().addComponents(
-            new ButtonBuilder()
-                .setLabel('Live Dashboard')
-                .setStyle(ButtonStyle.Link)
-                .setURL('https://team-1991-bot-jfya.onrender.com')[span_0](start_span)[span_0](end_span)
-        );
-
-        return message.reply({ embeds: [helpEmbed], components: [row] });
+        const embed = getMainHelpEmbed(message.author);
+        const components = getHelpComponents();
+        return message.reply({ embeds: [embed], components: components });
     }
 
-    // !ping command
+    // $ping
     if (command === 'ping') {
         return message.reply(`🏓 Pong! Latency: **${Math.round(client.ws.ping)}ms**`);
     }
 
-    // !botinfo command
-    if (command === 'botinfo') {
-        const uptime = Math.floor(process.uptime() / 60);
-        const embed = new EmbedBuilder()
-            .setColor('#5865F2')
-            .setTitle('🤖 Team 1991 — Bot Stats')
-            .addFields(
-                { name: 'Servers', value: `${client.guilds.cache.size}`, inline: true },
-                { name: 'Ping', value: `${Math.round(client.ws.ping)}ms`, inline: true },
-                { name: 'Uptime', value: `${uptime} mins`, inline: true }
-            );
-        return message.reply({ embeds: [embed] });
+    // $clear
+    if (command === 'clear') {
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
+            return message.reply('❌ You lack permission to delete messages!');
+        }
+        const amount = parseInt(args[0]);
+        if (!amount || amount < 1 || amount > 100) {
+            return message.reply('❌ Please specify a valid number between 1 and 100 (e.g. `$clear 20`)');
+        }
+        await message.channel.bulkDelete(amount, true);
+        return message.channel.send(`🧹 Successfully purged **${amount}** messages.`).then(m => setTimeout(() => m.delete(), 3000));
     }
 
-    // !serverinfo command
-    if (command === 'serverinfo') {
-        const embed = new EmbedBuilder()
-            .setColor('#2b2d31')
-            .setTitle(`📊 Server Info: ${message.guild.name}`)
-            .addFields(
-                { name: 'Members', value: `${message.guild.memberCount}`, inline: true },
-                { name: 'Roles', value: `${message.guild.roles.cache.size}`, inline: true },
-                { name: 'Channels', value: `${message.guild.channels.cache.size}`, inline: true }
-            );
-        return message.reply({ embeds: [embed] });
-    }
-
-    // !ban command
+    // $ban
     if (command === 'ban') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.BanMembers)) {
-            return message.reply('❌ You do not have permission to ban members!');
+            return message.reply('❌ You lack permission to ban members!');
         }
         const member = message.mentions.members.first();
-        if (!member) return message.reply('Mention the member to ban (e.g. `!ban @user`)');
+        if (!member) return message.reply('❌ Mention a member: `$ban @user [reason]`');
         if (!member.bannable) return message.reply('❌ Cannot ban this user (Check role hierarchy).');
-        await member.ban({ reason: args.slice(1).join(' ') || 'No reason specified' });
-        return message.reply(`✅ Successfully banned **${member.user.tag}**.`);
+        await member.ban({ reason: args.slice(1).join(' ') || 'No reason provided' });
+        return message.reply(`✅ Banned **${member.user.tag}**.`);
     }
 
-    // !kick command
+    // $kick
     if (command === 'kick') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.KickMembers)) {
-            return message.reply('❌ You do not have permission to kick members!');
+            return message.reply('❌ You lack permission to kick members!');
         }
         const member = message.mentions.members.first();
-        if (!member) return message.reply('Mention the member to kick (e.g. `!kick @user`)');
+        if (!member) return message.reply('❌ Mention a member: `$kick @user`');
         if (!member.kickable) return message.reply('❌ Cannot kick this user.');
         await member.kick();
-        return message.reply(`✅ Successfully kicked **${member.user.tag}**.`);
+        return message.reply(`✅ Kicked **${member.user.tag}**.`);
     }
 
-    // !mute / !timeout command
+    // $mute / $timeout
     if (command === 'mute' || command === 'timeout') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
-            return message.reply('❌ You do not have permission to timeout members!');
+            return message.reply('❌ You lack permission to timeout members!');
         }
         const member = message.mentions.members.first();
-        const minutes = parseInt(args[1]) || 5;
-        if (!member) return message.reply('Mention the member to mute (e.g. `!mute @user 10`)');
-        await member.timeout(minutes * 60 * 1000, 'Team 1991 Moderation');
-        return message.reply(`🔇 Muted **${member.user.tag}** for **${minutes}** minutes.`);
+        const mins = parseInt(args[1]) || 5;
+        if (!member) return message.reply('❌ Mention a member: `$mute @user 10`');
+        await member.timeout(mins * 60 * 1000, 'TEAM 1991 Moderation');
+        return message.reply(`🔇 Muted **${member.user.tag}** for **${mins}** minutes.`);
     }
 
-    // !unmute command
+    // $unmute
     if (command === 'unmute') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
-            return message.reply('❌ You do not have permission to moderate members!');
+            return message.reply('❌ You lack permission to manage timeouts!');
         }
         const member = message.mentions.members.first();
-        if (!member) return message.reply('Mention the member to unmute (e.g. `!unmute @user`)');
+        if (!member) return message.reply('❌ Mention a member: `$unmute @user`');
         await member.timeout(null);
         return message.reply(`🔊 Unmuted **${member.user.tag}**.`);
     }
 
-    // !clear command
-    if (command === 'clear') {
-        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
-            return message.reply('❌ You do not have permission to delete messages!');
-        }
-        const amount = parseInt(args[0]);
-        if (!amount || amount < 1 || amount > 100) {
-            return message.reply('Provide a count between 1 and 100 (e.g. `!clear 20`)');
-        }
-        await message.channel.bulkDelete(amount, true);
-        return message.channel.send(`🧹 Deleted **${amount}** messages.`).then(m => setTimeout(() => m.delete(), 3000));
-    }
-
-    // !lock command
+    // $lock
     if (command === 'lock') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.ManageChannels)) {
-            return message.reply('❌ You do not have permission to manage channels!');
+            return message.reply('❌ You lack permission to manage channels!');
         }
         await message.channel.permissionOverwrites.edit(message.guild.roles.everyone, { SendMessages: false });
         return message.reply('🔒 Channel locked.');
     }
 
-    // !unlock command
+    // $unlock
     if (command === 'unlock') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.ManageChannels)) {
-            return message.reply('❌ You do not have permission to manage channels!');
+            return message.reply('❌ You lack permission to manage channels!');
         }
         await message.channel.permissionOverwrites.edit(message.guild.roles.everyone, { SendMessages: true });
         return message.reply('🔓 Channel unlocked.');
     }
 
-    // !vckick command
+    // $vckick
     if (command === 'vckick') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.MoveMembers)) {
-            return message.reply('❌ You do not have permission to disconnect voice members!');
+            return message.reply('❌ You lack permission to disconnect voice members!');
         }
         const member = message.mentions.members.first();
-        if (!member || !member.voice.channel) return message.reply('User must be in a voice channel.');
+        if (!member || !member.voice.channel) return message.reply('❌ User must be inside a voice channel.');
         await member.voice.disconnect();
         return message.reply(`🔌 Disconnected **${member.user.tag}** from voice.`);
     }
 
-    // !vcmute command
+    // $vcmute
     if (command === 'vcmute') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.MuteMembers)) {
-            return message.reply('❌ You do not have permission to mute members in voice!');
+            return message.reply('❌ You lack permission to mute members in voice!');
         }
         const member = message.mentions.members.first();
-        if (!member || !member.voice.channel) return message.reply('User must be in a voice channel.');
+        if (!member || !member.voice.channel) return message.reply('❌ User must be inside a voice channel.');
         await member.voice.setMute(true);
-        return message.reply(`🔇 Voice-muted **${member.user.tag}**.`);
-    }
-
-    // !vcunmute command
-    if (command === 'vcunmute') {
-        if (!message.member.permissions.has(PermissionsBitField.Flags.MuteMembers)) {
-            return message.reply('❌ You do not have permission to unmute members in voice!');
-        }
-        const member = message.mentions.members.first();
-        if (!member || !member.voice.channel) return message.reply('User must be in a voice channel.');
-        await member.voice.setMute(false);
-        return message.reply(`🔊 Unmuted **${member.user.tag}** in voice.`);
+        return message.reply(`🔇 Muted **${member.user.tag}** in voice.`);
     }
 });
 
-// Authenticate securely via environment variable
+// UI Interactions: Button Clicks & Dropdown Selections
+client.on('interactionCreate', async (interaction) => {
+    if (interaction.isButton()) {
+        if (interaction.customId === 'help_close') {
+            return interaction.message.delete().catch(() => {});
+        }
+        if (interaction.customId === 'help_first' || interaction.customId === 'help_prev') {
+            const embed = getMainHelpEmbed(interaction.user);
+            return interaction.update({ embeds: [embed] });
+        }
+    }
+
+    if (interaction.isStringSelectMenu() && interaction.customId === 'help_select') {
+        const selected = interaction.values[0];
+
+        if (selected === 'mod_home') {
+            return interaction.update({ embeds: [getMainHelpEmbed(interaction.user)] });
+        }
+
+        const subEmbed = new EmbedBuilder().setColor('#FF0033');
+
+        if (selected === 'mod_antinuke') {
+            subEmbed.setTitle('🛡️ Antinuke Security Modules')
+                .setDescription(`
+**Available Commands:**
+\`${PREFIX}antinuke enable/disable\` — Toggle automated raid protection
+\`${PREFIX}whitelist @user\` — Grant antinuke immunity
+\`${PREFIX}unwhitelist @user\` — Revoke whitelist permissions
+\`${PREFIX}recovery\` — Emergency lockdown and permissions revert
+                `);
+        } else if (selected === 'mod_moderation') {
+            subEmbed.setTitle('🔨 Moderation Modules')
+                .setDescription(`
+**Available Commands:**
+\`${PREFIX}ban @user [reason]\` — Permanently ban member
+\`${PREFIX}kick @user\` — Kick member from server
+\`${PREFIX}mute @user [mins]\` — Apply member timeout
+\`${PREFIX}unmute @user\` — Remove active timeout
+\`${PREFIX}clear [amount]\` — Purge messages in bulk
+\`${PREFIX}lock\` / \`${PREFIX}unlock\` — Toggle channel sending permissions
+                `);
+        } else if (selected === 'mod_voice') {
+            subEmbed.setTitle('🔊 Voice Modules')
+                .setDescription(`
+**Available Commands:**
+\`${PREFIX}vckick @user\` — Disconnect user from active voice channel
+\`${PREFIX}vcmute @user\` — Server-mute user across voice
+\`${PREFIX}vcunmute @user\` — Remove server-mute from user
+                `);
+        } else if (selected === 'mod_utility') {
+            subEmbed.setTitle('🔧 Utility Modules')
+                .setDescription(`
+**Available Commands:**
+\`${PREFIX}help\` — Open this interactive panel
+\`${PREFIX}ping\` — Check websocket gateway ping
+\`${PREFIX}serverinfo\` — Display member and channel metrics
+                `);
+        }
+
+        return interaction.update({ embeds: [subEmbed] });
+    }
+});
+
+// Logs in securely via the Render Environment Variable
 client.login(process.env.DISCORD_TOKEN);
