@@ -83,3 +83,53 @@ process.on('unhandledRejection', (reason) => console.error('Unhandled Rejection:
 process.on('uncaughtException', (err) => console.error('Uncaught Exception:', err));
 
 client.login(process.env.DISCORD_TOKEN || 'MTU0OTM4MzI2Njk1NDY0NTU0NQ.GPmDeo.9HVX5-G3Z2SX7KqQN5HFM4w9RiVG_kgRZ96NXE');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+
+client.on('messageCreate', async (message) => {
+    if (message.author.bot || !message.content.startsWith('!')) return;
+
+    const args = message.content.slice(1).trim().split(/ +/);
+    const command = args.shift().toLowerCase();
+
+    // Help Command
+    if (command === 'help') {
+        const helpEmbed = new EmbedBuilder()
+            .setColor('#2b2d31')
+            .setTitle('🛡️ Team 1991 Bot - Help Menu')
+            .setDescription('**Team 1991** holo ekta advance moderation ebong security bot. Nicher category command-gulo use korun:')
+            .addFields(
+                { 
+                    name: '🛡️ Security & Antinuke', 
+                    value: '`!antinuke`, `!whitelist`, `!unwhitelist`, `!whitelisted`, `!recovery`' 
+                },
+                { 
+                    name: '🔨 Moderation', 
+                    value: '`!ban`, `!kick`, `!timeout`, `!unmute`, `!jail`, `!unjail`, `!clear`, `!lock`, `!unlock`' 
+                },
+                { 
+                    name: '🔊 Voice Management', 
+                    value: '`!vc lock`, `!vc unlock`, `!vc hide`, `!vc limit`, `!vckick`' 
+                },
+                { 
+                    name: '⚙️ Utility & General', 
+                    value: '`!help`, `!ping`, `!botinfo`, `!serverinfo`, `!userinfo`' 
+                }
+            )
+            .setFooter({ text: 'Team 1991 Security • 24/7 Active', iconURL: client.user.displayAvatarURL() })
+            .setTimestamp();
+
+        const row = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setLabel('Dashboard')
+                .setStyle(ButtonStyle.Link)
+                .setURL('https://team-1991-bot-jfya.onrender.com')
+        );
+
+        message.reply({ embeds: [helpEmbed], components: [row] });
+    }
+
+    // Ping Command
+    if (command === 'ping') {
+        message.reply(`🏓 Pong! Bot Latency: **${Math.round(client.ws.ping)}ms**`);
+    }
+});
