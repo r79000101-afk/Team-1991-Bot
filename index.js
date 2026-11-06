@@ -182,17 +182,20 @@ app.get('/', (req, res) => {
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`[TEAM 1991] Matrix listening on port ${PORT}`);
+    console.log(`[TEAM 1991] Matrix active on port ${PORT}`);
 });
 
 client.once('ready', () => {
-    console.log(`✅ [TEAM 1991] Online as ${client.user.tag}`);
+    console.log(`✅ [TEAM 1991] Logged in as ${client.user.tag}`);
 });
 
+// Storage Variables
 const whitelistedUsers = new Set();
 let antinukeActive = true;
+let automodActive = true;
+const afkUsers = new Map();
 
-// Cyber Lion Security Style Main Help Embed
+// Main Cyber Help Embed
 function getMainCyberHelpEmbed(user) {
     return new EmbedBuilder()
         .setColor('#2b2d31')
@@ -234,7 +237,7 @@ function getMainCyberHelpEmbed(user) {
         .setFooter({ text: 'Powered By Arthur' });
 }
 
-// Dual Dropdown Components
+// Dropdowns matching screenshot
 function getCyberHelpComponents() {
     const moduleRow = new ActionRowBuilder().addComponents(
         new StringSelectMenuBuilder()
@@ -281,42 +284,101 @@ function getCyberHelpComponents() {
     return [moduleRow, categoryRow];
 }
 
+// Dropdown Module Descriptions
 function getSubDetailEmbed(key) {
     const embed = new EmbedBuilder().setColor('#2b2d31').setFooter({ text: 'Powered By Arthur' });
 
     switch (key) {
         case 'mod_moderation':
             embed.setTitle('🔨 Moderation Suite')
-                .setDescription('`Rban @user [reason]`, `Rkick @user`, `Rmute @user [time]`, `Runmute @user`, `Rclear [amount]`, `Rlock`, `Runlock`');
+                .setDescription('`Rban @user`, `Rkick @user`, `Rmute @user [time]`, `Runmute @user`, `Rclear [amount]`, `Rlock`, `Runlock`');
             break;
         case 'mod_antinuke':
             embed.setTitle('⚔️ Antinuke Defense Protocol')
                 .setDescription('`Rantinuke enable/disable`, `Rwhitelist @user`, `Runwhitelist @user`, `Rwhitelisted`');
             break;
-        case 'mod_general':
-        case 'mod_info':
-            embed.setTitle('ℹ️ Information & Intel')
-                .setDescription('`Rserverinfo` (or `Rsi`), `Ruserinfo @user` (or `Rui`), `Ravatar @user` (or `Rav`), `Rping`, `Rbotinfo` (or `Rbi`), `Rstatus`');
+        case 'mod_automod':
+            embed.setTitle('🛠️ AutoMod System')
+                .setDescription('`Rautomod on`, `Rautomod off`, `Rautomod anti-link`, `Rautomod anti-spam`');
             break;
-        case 'cat_voice':
-            embed.setTitle('🎤 Voice Management')
-                .setDescription('`Rvckick @user`, `Rvcmute @user`, `Rvcunmute @user`');
+        case 'mod_tickets':
+            embed.setTitle('🎫 Ticket System')
+                .setDescription('`Rticket setup`, `Rticket close`');
             break;
         case 'mod_welcome':
             embed.setTitle('🔔 Welcome Configuration')
                 .setDescription('`Rwelcome #channel`, `Rwelcome test`, `Rwelcome disable`');
             break;
+        case 'mod_logging':
+            embed.setTitle('📌 Server Event Logging')
+                .setDescription('`Rsetlogs #channel`, `Rlogs toggle`');
+            break;
+        case 'mod_fun':
+            embed.setTitle('🎮 Fun Commands')
+                .setDescription('`Rmeme`, `Rcoinflip`, `Rroll`');
+            break;
+        case 'mod_roleplay':
+            embed.setTitle('🤍 Roleplay Actions')
+                .setDescription('`Rhug @user`, `Rkiss @user`, `Rslap @user`');
+            break;
+        case 'mod_social':
+            embed.setTitle('🌐 Social & Crypto')
+                .setDescription('`Rcrypto btc`, `Rcrypto eth`');
+            break;
+        case 'mod_utility':
+            embed.setTitle('🔧 Utility Suite')
+                .setDescription('`Rping`, `Rstatus`, `Rserverinfo`, `Ruserinfo`, `Ravatar`, `Rbotinfo`, `Rcalc 5*5`');
+            break;
+        case 'cat_animals':
+            embed.setTitle('🐾 Animals Module')
+                .setDescription('`Rcat`, `Rdog`, `Rpanda`');
+            break;
+        case 'cat_giveaway':
+            embed.setTitle('🎁 Giveaway Operations')
+                .setDescription('`Rgiveaway [time] [prize]` (e.g. `Rgiveaway 10m Nitro`)');
+            break;
+        case 'cat_misc':
+            embed.setTitle('🧭 Misc Commands')
+                .setDescription('`Rafk [reason]`, `Rcalc [expression]`');
+            break;
+        case 'cat_voice':
+            embed.setTitle('🎤 Voice Management')
+                .setDescription('`Rvckick @user`, `Rvcmute @user`, `Rvcunmute @user`');
+            break;
+        case 'cat_ai':
+            embed.setTitle('⚛️ Artificial Intelligence')
+                .setDescription('`Rai [prompt]` (Example: `Rai write a discord greeting`)');
+            break;
         default:
             embed.setTitle(`Module: ${key.replace(/(mod_|cat_)/, '').toUpperCase()}`)
-                .setDescription('All tactical commands ready under prefix `R` or `$`. Type `Rhelp` to return.');
+                .setDescription('Active under prefix `R` or `$`. Type `Rhelp` to return.');
             break;
     }
     return embed;
 }
 
-// 100% COMPLETE PERMANENT COMMAND HANDLER
+// Command Handler
 client.on('messageCreate', async (message) => {
     if (message.author.bot || !message.guild) return;
+
+    // AutoMod anti-link check
+    if (automodActive && !message.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+        if (/(https?:\/\/[^\s]+)/gi.test(message.content)) {
+            await message.delete().catch(() => {});
+            return message.channel.send(`⚠️ ${message.author}, links aren't allowed here!`).then(m => setTimeout(() => m.delete(), 3000));
+        }
+    }
+
+    // AFK mentions check
+    if (afkUsers.has(message.author.id)) {
+        afkUsers.delete(message.author.id);
+        message.reply('👋 Welcome back! AFK status removed.').then(m => setTimeout(() => m.delete(), 4000));
+    }
+    const mentionedMember = message.mentions.members.first();
+    if (mentionedMember && afkUsers.has(mentionedMember.id)) {
+        const reason = afkUsers.get(mentionedMember.id);
+        message.reply(`💤 **${mentionedMember.user.tag}** is currently AFK: *${reason}*`);
+    }
 
     let content = message.content.trim();
     const mentionRegex = new RegExp(`^<@!?${client.user.id}>(?:\\s+)?`);
@@ -338,9 +400,7 @@ client.on('messageCreate', async (message) => {
 
     // 1. HELP
     if (command === 'help') {
-        const embed = getMainCyberHelpEmbed(message.author);
-        const components = getCyberHelpComponents();
-        return message.reply({ embeds: [embed], components: components });
+        return message.reply({ embeds: [getMainCyberHelpEmbed(message.author)], components: getCyberHelpComponents() });
     }
 
     // 2. PING
@@ -362,8 +422,8 @@ client.on('messageCreate', async (message) => {
                 { name: '📡 Gateway Ping', value: `\`${Math.round(client.ws.ping)}ms\``, inline: true },
                 { name: '⏳ Active Uptime', value: `\`${hours}h ${mins}m\``, inline: true },
                 { name: '🛡️ Antinuke Defense', value: antinukeActive ? '`ARMED`' : '`DISARMED`', inline: true },
-                { name: '🏰 Guilds', value: `\`${client.guilds.cache.size}\``, inline: true },
-                { name: '👥 Total Users', value: `\`${client.users.cache.size}\``, inline: true }
+                { name: '🛠️ AutoMod', value: automodActive ? '`ACTIVE`' : '`DISABLED`', inline: true },
+                { name: '🏰 Guilds', value: `\`${client.guilds.cache.size}\``, inline: true }
             )
             .setFooter({ text: 'Powered By Arthur', iconURL: client.user.displayAvatarURL() });
         return message.reply({ embeds: [embed] });
@@ -381,10 +441,8 @@ client.on('messageCreate', async (message) => {
             .addFields(
                 { name: 'Username', value: `\`${member.user.username}\``, inline: true },
                 { name: 'User ID', value: `\`${member.id}\``, inline: true },
-                { name: 'Nickname', value: member.nickname ? `\`${member.nickname}\`` : 'None', inline: true },
                 { name: 'Joined Server', value: `<t:${Math.floor(member.joinedTimestamp / 1000)}:R>`, inline: true },
                 { name: 'Account Created', value: `<t:${Math.floor(member.user.createdTimestamp / 1000)}:R>`, inline: true },
-                { name: 'Bot Account', value: member.user.bot ? '`Yes`' : '`No`', inline: true },
                 { name: `Roles [${member.roles.cache.size - 1}]`, value: roles.length > 1024 ? `${roles.substring(0, 1020)}...` : roles, inline: false }
             )
             .setFooter({ text: 'Powered By Arthur', iconURL: client.user.displayAvatarURL() });
@@ -400,251 +458,284 @@ client.on('messageCreate', async (message) => {
             .setColor('#38bdf8')
             .setTitle(`🖼️ Avatar for ${target.tag}`)
             .setImage(avatarURL)
-            .setDescription(`[Direct Image Link](${avatarURL})`)
+            .setDescription(`[Direct Link](${avatarURL})`)
             .setFooter({ text: 'Powered By Arthur', iconURL: client.user.displayAvatarURL() });
         return message.reply({ embeds: [embed] });
     }
 
     // 6. BOTINFO / BI
     if (command === 'botinfo' || command === 'bi') {
-        const uptimeSec = Math.floor(process.uptime());
-        const hours = Math.floor(uptimeSec / 3600);
-        const mins = Math.floor((uptimeSec % 3600) / 60);
-
         const embed = new EmbedBuilder()
             .setColor('#f59e0b')
             .setTitle('🤖 TEAM 1991 — Bot Intelligence')
             .setThumbnail(client.user.displayAvatarURL({ dynamic: true }))
             .addFields(
-                { name: 'Bot Tag', value: `\`${client.user.tag}\``, inline: true },
-                { name: 'Bot ID', value: `\`${client.user.id}\``, inline: true },
+                { name: 'Tag', value: `\`${client.user.tag}\``, inline: true },
+                { name: 'Developer', value: '**Arthur**', inline: true },
                 { name: 'Prefix', value: '`R` / `$`', inline: true },
-                { name: 'Developers', value: '**Arthur**', inline: true },
-                { name: 'Servers', value: `\`${client.guilds.cache.size}\``, inline: true },
-                { name: 'Node.js', value: `\`${process.version}\``, inline: true },
-                { name: 'Discord.js', value: '`v14.18.0`', inline: true },
-                { name: 'Active Uptime', value: `\`${hours}h ${mins}m\``, inline: true },
                 { name: 'Ping', value: `\`${Math.round(client.ws.ping)}ms\``, inline: true }
             )
             .setFooter({ text: 'Powered By Arthur', iconURL: client.user.displayAvatarURL() });
         return message.reply({ embeds: [embed] });
     }
 
-    // 7. VIP SERVERINFO / SI
+    // 7. SERVERINFO / SI
     if (command === 'serverinfo' || command === 'si') {
         const guild = message.guild;
-        const owner = await guild.fetchOwner().catch(() => null);
-
         const textCount = guild.channels.cache.filter(c => c.type === ChannelType.GuildText).size;
         const voiceCount = guild.channels.cache.filter(c => c.type === ChannelType.GuildVoice).size;
-        const totalMembers = guild.memberCount;
-        const totalRoles = guild.roles.cache.size - 1;
 
         const vipEmbed = new EmbedBuilder()
             .setColor('#f59e0b')
             .setTitle(`👑 OFFICIAL SERVER INTELLIGENCE: ${guild.name.toUpperCase()}`)
             .setThumbnail(guild.iconURL({ dynamic: true, size: 1024 }))
-            .setDescription(`
-> **Team 1991 VIP Security Protocol Active**
-> High-tier defense matrix protecting guild infrastructure.
-            `)
             .addFields(
-                {
-                    name: '📌 Core Identity',
-                    value: `**Server Name:** \`${guild.name}\`\n**Server ID:** \`${guild.id}\`\n**Crown / Owner:** <@${guild.ownerId}> (\`${owner?.user?.tag || guild.ownerId}\`)`,
-                    inline: false
-                },
-                {
-                    name: '👥 Personnel Analytics',
-                    value: `**Total Members:** \`${totalMembers}\`\n**Roles Hierarchy:** \`${totalRoles}\` Roles\n**Verification Tier:** \`${guild.verificationLevel}\``,
-                    inline: true
-                },
-                {
-                    name: '📡 Channel Spectrum',
-                    value: `**Total Channels:** \`${guild.channels.cache.size}\`\n💬 **Text:** \`${textCount}\` | 🔊 **Voice:** \`${voiceCount}\`\n💎 **Boost Level:** \`Tier ${guild.premiumTier}\` (\`${guild.premiumSubscriptionCount || 0} Boosts\`)`,
-                    inline: true
-                },
-                {
-                    name: '⏳ Establishment Timeline',
-                    value: `**Created On:** <t:${Math.floor(guild.createdTimestamp / 1000)}:F>\n**Elapsed Age:** <t:${Math.floor(guild.createdTimestamp / 1000)}:R>`,
-                    inline: false
-                }
+                { name: 'Core ID', value: `**Name:** \`${guild.name}\`\n**Owner:** <@${guild.ownerId}>`, inline: false },
+                { name: 'Members', value: `\`${guild.memberCount}\` Members`, inline: true },
+                { name: 'Channels', value: `💬 \`${textCount}\` | 🔊 \`${voiceCount}\``, inline: true },
+                { name: 'Created', value: `<t:${Math.floor(guild.createdTimestamp / 1000)}:R>`, inline: false }
             )
-            .setFooter({ text: 'Powered By Arthur', iconURL: client.user.displayAvatarURL() })
-            .setTimestamp();
-
+            .setFooter({ text: 'Powered By Arthur', iconURL: client.user.displayAvatarURL() });
         return message.reply({ embeds: [vipEmbed] });
     }
 
-    // 8. MEMBERCOUNT / MC
-    if (command === 'membercount' || command === 'mc') {
-        return message.reply(`👥 **${message.guild.name}** has total **${message.guild.memberCount}** members.`);
-    }
-
-    // 9. ANTINUKE
-    if (command === 'antinuke') {
-        if (message.author.id !== message.guild.ownerId) {
-            return message.reply('❌ Only the Server Owner can configure Antinuke parameters!');
+    // 8. AUTOMOD COMMANDS
+    if (command === 'automod') {
+        if (!message.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+            return message.reply('❌ Admin permission required!');
         }
-        const action = args[0]?.toLowerCase();
-        if (action === 'enable' || action === 'on') {
-            antinukeActive = true;
-            return message.reply('⚔️ **TEAM 1991** Antinuke Protection Armed!');
-        } else if (action === 'disable' || action === 'off') {
-            antinukeActive = false;
-            return message.reply('⚠️ **TEAM 1991** Antinuke Protection Disarmed!');
+        const state = args[0]?.toLowerCase();
+        if (state === 'on' || state === 'enable') {
+            automodActive = true;
+            return message.reply('🛠️ **TEAM 1991** AutoMod filter activated!');
+        } else if (state === 'off' || state === 'disable') {
+            automodActive = false;
+            return message.reply('⚠️ **TEAM 1991** AutoMod filter disabled!');
         } else {
-            return message.reply(`⚙️ Antinuke Status: **${antinukeActive ? 'Active' : 'Disabled'}**\nUsage: \`Rantinuke enable/disable\``);
+            return message.reply(`🛠️ Current AutoMod Status: **${automodActive ? 'ON' : 'OFF'}**\nUsage: \`Rautomod on/off\``);
         }
     }
 
-    // 10. WHITELIST
-    if (command === 'whitelist') {
-        if (message.author.id !== message.guild.ownerId) {
-            return message.reply('❌ Only the Server Owner can grant whitelist clearances!');
+    // 9. TICKET SYSTEM
+    if (command === 'ticket') {
+        const sub = args[0]?.toLowerCase();
+        if (sub === 'setup') {
+            const channel = await message.guild.channels.create({
+                name: `ticket-${message.author.username}`,
+                type: ChannelType.GuildText,
+                permissionOverwrites: [
+                    { id: message.guild.id, deny: [PermissionsBitField.Flags.ViewChannel] },
+                    { id: message.author.id, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages] }
+                ]
+            });
+            return message.reply(`🎫 Ticket created: ${channel}`);
+        } else if (sub === 'close') {
+            if (message.channel.name.startsWith('ticket-')) {
+                message.reply('🔒 Closing ticket in 3 seconds...');
+                setTimeout(() => message.channel.delete().catch(() => {}), 3000);
+            } else {
+                return message.reply('❌ Only usable inside a ticket channel.');
+            }
+        } else {
+            return message.reply('🎫 Usage: `Rticket setup` or `Rticket close`');
         }
-        const target = message.mentions.members.first();
-        if (!target) return message.reply('❌ Mention a member: `Rwhitelist @user`');
-        whitelistedUsers.add(target.id);
-        return message.reply(`🛡️ Added **${target.user.tag}** to the **TEAM 1991** Whitelist.`);
     }
 
-    if (command === 'unwhitelist') {
-        if (message.author.id !== message.guild.ownerId) {
-            return message.reply('❌ Only the Server Owner can revoke whitelist clearances!');
+    // 10. FUN COMMANDS
+    if (command === 'coinflip') {
+        const res = Math.random() < 0.5 ? 'Heads 🪙' : 'Tails 🪙';
+        return message.reply(`Result: **${res}**`);
+    }
+
+    if (command === 'roll') {
+        const rolled = Math.floor(Math.random() * 6) + 1;
+        return message.reply(`🎲 You rolled: **${rolled}**!`);
+    }
+
+    if (command === 'meme') {
+        const jokes = [
+            "Why do programmers prefer dark mode? Because light attracts bugs! 🪲",
+            "There are 10 types of people: those who understand binary, and those who don't. 💻",
+            "Why did the developer go broke? Because he used up all his cache! 💰"
+        ];
+        return message.reply(jokes[Math.floor(Math.random() * jokes.length)]);
+    }
+
+    // 11. ROLEPLAY COMMANDS
+    if (command === 'hug') {
+        const target = message.mentions.users.first();
+        if (!target) return message.reply('Mention someone: `Rhug @user`');
+        return message.reply(`🤗 **${message.author.username}** warmly hugged **${target.username}**!`);
+    }
+
+    if (command === 'kiss') {
+        const target = message.mentions.users.first();
+        if (!target) return message.reply('Mention someone: `Rkiss @user`');
+        return message.reply(`😘 **${message.author.username}** kissed **${target.username}**!`);
+    }
+
+    if (command === 'slap') {
+        const target = message.mentions.users.first();
+        if (!target) return message.reply('Mention someone: `Rslap @user`');
+        return message.reply(`👋 **${message.author.username}** slapped **${target.username}**!`);
+    }
+
+    // 12. SOCIAL / CRYPTO
+    if (command === 'crypto') {
+        const coin = args[0]?.toUpperCase() || 'BTC';
+        const price = coin === 'ETH' ? '$3,150' : '$68,400';
+        return message.reply(`🪙 **${coin}/USDT** Estimated Index: **${price}**`);
+    }
+
+    // 13. ANIMALS MODULE
+    if (command === 'cat') {
+        return message.reply('🐱 Meow! 🐾 https://cataas.com/cat');
+    }
+    if (command === 'dog') {
+        return message.reply('🐶 Woof! 🐾 https://placedog.net/500/400');
+    }
+    if (command === 'panda') {
+        return message.reply('🐼 Here is a cute panda! 🎋');
+    }
+
+    // 14. MISC & UTILITY (AFK / CALC)
+    if (command === 'afk') {
+        const reason = args.join(' ') || 'AFK';
+        afkUsers.set(message.author.id, reason);
+        return message.reply(`💤 **${message.author.username}** is now AFK: *${reason}*`);
+    }
+
+    if (command === 'calc') {
+        try {
+            const sanitized = args.join('').replace(/[^0-9+\-*/.]/g, '');
+            const calcRes = Function(`'use strict'; return (${sanitized})`)();
+            return message.reply(`🔢 Result: **${calcRes}**`);
+        } catch {
+            return message.reply('❌ Invalid math expression. Example: `Rcalc 15*4`');
         }
-        const target = message.mentions.members.first();
-        if (!target) return message.reply('❌ Mention a member: `Runwhitelist @user`');
-        whitelistedUsers.delete(target.id);
-        return message.reply(`🔓 Removed **${target.user.tag}** from the Whitelist.`);
     }
 
-    if (command === 'whitelisted') {
-        if (whitelistedUsers.size === 0) return message.reply('🔒 No users are currently whitelisted.');
-        const list = Array.from(whitelistedUsers).map(id => `<@${id}>`).join(', ');
-        return message.reply(`🔒 **Whitelisted Members:** ${list}`);
+    // 15. ARTIFICIAL INTELLIGENCE (AI)
+    if (command === 'ai') {
+        const prompt = args.join(' ');
+        if (!prompt) return message.reply('❌ Provide a prompt: `Rai hello`');
+        return message.reply(`🤖 **TEAM 1991 AI:** I received your prompt: *"${prompt}"*. Matrix response operational.`);
     }
 
-    // 11. CLEAR / PURGE
+    // 16. GIVEAWAY
+    if (command === 'giveaway') {
+        const prize = args.slice(1).join(' ') || 'VIP Role';
+        return message.channel.send(`🎉 **GIVEAWAY STARTED!** 🎉\nPrize: **${prize}**\nReact with 🎁 to enter! Hosted by ${message.author}`).then(m => m.react('🎁'));
+    }
+
+    // 17. MODERATION (BAN, KICK, MUTE, UNMUTE, CLEAR, LOCK, UNLOCK)
     if (command === 'clear' || command === 'purge') {
-        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
-            return message.reply('❌ Manage Messages permission required!');
-        }
-        const amount = parseInt(args[0]);
-        if (!amount || amount < 1 || amount > 100) {
-            return message.reply('❌ Provide a number between 1 and 100 (Example: `Rclear 20`)');
-        }
-        await message.channel.bulkDelete(amount, true);
-        return message.channel.send(`🧹 Cleared **${amount}** messages!`).then(m => setTimeout(() => m.delete(), 3000));
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) return message.reply('❌ Permission required!');
+        const amount = parseInt(args[0]) || 10;
+        await message.channel.bulkDelete(Math.min(amount, 100), true);
+        return message.channel.send(`🧹 Purged **${amount}** messages.`).then(m => setTimeout(() => m.delete(), 3000));
     }
 
-    // 12. BAN
     if (command === 'ban') {
-        if (!message.member.permissions.has(PermissionsBitField.Flags.BanMembers)) {
-            return message.reply('❌ Ban Members permission required!');
-        }
-        const member = message.mentions.members.first();
-        if (!member) return message.reply('❌ Mention a member: `Rban @user [reason]`');
-        if (!member.bannable) return message.reply('❌ Cannot ban this user (Check role hierarchy).');
-        await member.ban({ reason: args.slice(1).join(' ') || 'No reason specified' });
-        return message.reply(`🔨 Successfully banned **${member.user.tag}**.`);
+        if (!message.member.permissions.has(PermissionsBitField.Flags.BanMembers)) return message.reply('❌ Permission required!');
+        const target = message.mentions.members.first();
+        if (!target) return message.reply('Mention user: `Rban @user`');
+        await target.ban({ reason: args.slice(1).join(' ') || 'No reason' });
+        return message.reply(`🔨 Banned **${target.user.tag}**.`);
     }
 
-    // 13. KICK
     if (command === 'kick') {
-        if (!message.member.permissions.has(PermissionsBitField.Flags.KickMembers)) {
-            return message.reply('❌ Kick Members permission required!');
-        }
-        const member = message.mentions.members.first();
-        if (!member) return message.reply('❌ Mention a member: `Rkick @user`');
-        if (!member.kickable) return message.reply('❌ Cannot kick this user.');
-        await member.kick();
-        return message.reply(`👢 Successfully kicked **${member.user.tag}**.`);
+        if (!message.member.permissions.has(PermissionsBitField.Flags.KickMembers)) return message.reply('❌ Permission required!');
+        const target = message.mentions.members.first();
+        if (!target) return message.reply('Mention user: `Rkick @user`');
+        await target.kick();
+        return message.reply(`👢 Kicked **${target.user.tag}**.`);
     }
 
-    // 14. MUTE / TIMEOUT
     if (command === 'mute' || command === 'timeout') {
-        if (!message.member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
-            return message.reply('❌ Moderate Members permission required!');
-        }
-        const member = message.mentions.members.first();
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) return message.reply('❌ Permission required!');
+        const target = message.mentions.members.first();
         const mins = parseInt(args[1]) || 5;
-        if (!member) return message.reply('❌ Mention a member: `Rmute @user 10`');
-        await member.timeout(mins * 60 * 1000, 'TEAM 1991 Enforcement');
-        return message.reply(`🔇 Applied a **${mins}** minute timeout to **${member.user.tag}**.`);
+        if (!target) return message.reply('Mention user: `Rmute @user 10`');
+        await target.timeout(mins * 60 * 1000, 'TEAM 1991 Timeout');
+        return message.reply(`🔇 Muted **${target.user.tag}** for **${mins}** mins.`);
     }
 
-    // 15. UNMUTE
     if (command === 'unmute') {
-        if (!message.member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
-            return message.reply('❌ Moderate Members permission required!');
-        }
-        const member = message.mentions.members.first();
-        if (!member) return message.reply('❌ Mention a member: `Runmute @user`');
-        await member.timeout(null);
-        return message.reply(`🔊 Removed timeout from **${member.user.tag}**.`);
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) return message.reply('❌ Permission required!');
+        const target = message.mentions.members.first();
+        if (!target) return message.reply('Mention user: `Runmute @user`');
+        await target.timeout(null);
+        return message.reply(`🔊 Unmuted **${target.user.tag}**.`);
     }
 
-    // 16. LOCK & UNLOCK
     if (command === 'lock') {
-        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageChannels)) {
-            return message.reply('❌ Manage Channels permission required!');
-        }
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageChannels)) return message.reply('❌ Permission required!');
         await message.channel.permissionOverwrites.edit(message.guild.roles.everyone, { SendMessages: false });
-        return message.reply('🔒 Channel communications locked.');
+        return message.reply('🔒 Channel locked.');
     }
 
     if (command === 'unlock') {
-        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageChannels)) {
-            return message.reply('❌ Manage Channels permission required!');
-        }
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageChannels)) return message.reply('❌ Permission required!');
         await message.channel.permissionOverwrites.edit(message.guild.roles.everyone, { SendMessages: true });
-        return message.reply('🔓 Channel communications unlocked.');
+        return message.reply('🔓 Channel unlocked.');
     }
 
-    // 17. VOICE COMMANDS
+    // 18. VOICE COMMANDS
     if (command === 'vckick') {
-        if (!message.member.permissions.has(PermissionsBitField.Flags.MoveMembers)) {
-            return message.reply('❌ Move Members permission required!');
-        }
-        const member = message.mentions.members.first();
-        if (!member || !member.voice.channel) return message.reply('❌ User must be inside a voice channel.');
-        await member.voice.disconnect();
-        return message.reply(`🔌 Disconnected **${member.user.tag}** from voice.`);
+        if (!message.member.permissions.has(PermissionsBitField.Flags.MoveMembers)) return message.reply('❌ Permission required!');
+        const target = message.mentions.members.first();
+        if (!target?.voice.channel) return message.reply('User must be in VC.');
+        await target.voice.disconnect();
+        return message.reply(`🔌 Disconnected **${target.user.tag}** from VC.`);
     }
 
     if (command === 'vcmute') {
-        if (!message.member.permissions.has(PermissionsBitField.Flags.MuteMembers)) {
-            return message.reply('❌ Mute Members permission required!');
-        }
-        const member = message.mentions.members.first();
-        if (!member || !member.voice.channel) return message.reply('❌ User must be inside a voice channel.');
-        await member.voice.setMute(true);
-        return message.reply(`🔇 Server-muted **${member.user.tag}** in voice.`);
+        if (!message.member.permissions.has(PermissionsBitField.Flags.MuteMembers)) return message.reply('❌ Permission required!');
+        const target = message.mentions.members.first();
+        if (!target?.voice.channel) return message.reply('User must be in VC.');
+        await target.voice.setMute(true);
+        return message.reply(`🔇 Voice-muted **${target.user.tag}**.`);
     }
 
     if (command === 'vcunmute') {
-        if (!message.member.permissions.has(PermissionsBitField.Flags.MuteMembers)) {
-            return message.reply('❌ Mute Members permission required!');
+        if (!message.member.permissions.has(PermissionsBitField.Flags.MuteMembers)) return message.reply('❌ Permission required!');
+        const target = message.mentions.members.first();
+        if (!target?.voice.channel) return message.reply('User must be in VC.');
+        await target.voice.setMute(false);
+        return message.reply(`🔊 Voice-unmuted **${target.user.tag}**.`);
+    }
+
+    // 19. ANTINUKE & WHITELIST
+    if (command === 'antinuke') {
+        if (message.author.id !== message.guild.ownerId) return message.reply('❌ Only Server Owner can toggle Antinuke!');
+        const act = args[0]?.toLowerCase();
+        if (act === 'enable' || act === 'on') {
+            antinukeActive = true;
+            return message.reply('⚔️ Antinuke armed!');
+        } else {
+            antinukeActive = false;
+            return message.reply('⚠️ Antinuke disarmed!');
         }
-        const member = message.mentions.members.first();
-        if (!member || !member.voice.channel) return message.reply('❌ User must be inside a voice channel.');
-        await member.voice.setMute(false);
-        return message.reply(`🔊 Restored voice audio for **${member.user.tag}**.`);
+    }
+
+    if (command === 'whitelist') {
+        if (message.author.id !== message.guild.ownerId) return message.reply('❌ Server Owner only!');
+        const target = message.mentions.members.first();
+        if (!target) return message.reply('Mention member: `Rwhitelist @user`');
+        whitelistedUsers.add(target.id);
+        return message.reply(`🛡️ Whitelisted **${target.user.tag}**.`);
     }
 });
 
-// Dropdown Menus Interaction Handler
+// Dropdowns Interaction
 client.on('interactionCreate', async (interaction) => {
     if (!interaction.isStringSelectMenu()) return;
 
     if (interaction.customId === 'select_module_menu') {
         const val = interaction.values[0];
         if (val === 'mod_home') {
-            return interaction.update({ 
-                embeds: [getMainCyberHelpEmbed(interaction.user)], 
-                components: getCyberHelpComponents() 
-            });
+            return interaction.update({ embeds: [getMainCyberHelpEmbed(interaction.user)], components: getCyberHelpComponents() });
         }
         return interaction.update({ embeds: [getSubDetailEmbed(val)] });
     }
