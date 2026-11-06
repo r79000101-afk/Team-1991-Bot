@@ -7,7 +7,8 @@ const {
     ButtonStyle,
     StringSelectMenuBuilder, 
     PermissionsBitField,
-    ChannelType
+    ChannelType,
+    AuditLogEvent
 } = require('discord.js');
 const express = require('express');
 
@@ -27,7 +28,7 @@ const client = new Client({
     ]
 });
 
-// Crash prevention (Permanent 24/7 Uptime)
+// Crash prevention (Permanent 24/7 Zero-Downtime)
 process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
@@ -35,14 +36,15 @@ process.on('uncaughtException', (err, origin) => {
     console.error(`Caught exception: ${err} | Origin: ${origin}`);
 });
 
-const WHITE_ACCENT = '#ffffff'; // Screenshot-er vertical white border
+const WHITE_ACCENT = '#ffffff';
 const BLACK_COLOR = '#000001';
 const PREFIX = 'R';
 
-// Security States (Anti-Bypass Matrix)
+// Security States (Anti-Bypass Protection)
 const whitelistedUsers = new Set();
 let antinukeActive = true;
 let automodActive = true;
+let nightmodeActive = false;
 const afkUsers = new Map();
 
 function isImmune(guild, userId) {
@@ -53,7 +55,7 @@ function isImmune(guild, userId) {
     return false;
 }
 
-// Tenor Direct GIFs (Guaranteed to load)[span_15](start_span)[span_15](end_span)
+// 100% Guaranteed Tenor Direct CDN GIFs
 const roleplayGifs = {
     hug: ['https://c.tenor.com/7x-k3vXg61AAAAAC/anime-hug.gif', 'https://c.tenor.com/2bAUauAenbUAAAAC/anime-hug.gif'],
     kiss: ['https://c.tenor.com/I8kWjuAtSn8AAAAC/anime-kiss.gif', 'https://c.tenor.com/F0fHSHmbyLoAAAAC/kiss-anime.gif'],
@@ -64,7 +66,7 @@ const roleplayGifs = {
 };
 
 // -------------------------------------------------------------
-// LIVE DASHBOARD (Xieron Architecture)[span_16](start_span)[span_16](end_span)
+// LIVE DASHBOARD (Xieron Architecture + ID Login)[span_6](start_span)[span_6](end_span)
 // -------------------------------------------------------------
 app.get('/', (req, res) => {
     res.send(`
@@ -83,7 +85,9 @@ app.get('/', (req, res) => {
             h1 { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
             p { font-size: 13px; color: #8292ab; margin-bottom: 26px; }
             input { width: 100%; background: #06090e; border: 1px solid #1a2333; padding: 14px 16px; border-radius: 10px; color: #ffffff; font-size: 14px; margin-bottom: 16px; outline: none; }
-            button { width: 100%; background: #10b981; border: none; padding: 14px; border-radius: 10px; color: #ffffff; font-size: 14px; font-weight: 700; cursor: pointer; }
+            input:focus { border-color: #38bdf8; }
+            button { width: 100%; background: #10b981; border: none; padding: 14px; border-radius: 10px; color: #ffffff; font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+            button:hover { background: #059669; }
             .hint { font-size: 12px; color: #475569; margin-top: 18px; }
         </style>
     </head>
@@ -205,13 +209,13 @@ app.listen(PORT, '0.0.0.0', () => console.log(`Dashboard listening on port ${POR
 client.once('ready', () => console.log(`✅ [TEAM 1991 Dashboard] Online as ${client.user.tag}`));
 
 // -------------------------------------------------------------
-// EXACT MARKED EMBED & DROPDOWN (SCREENSHOT MATCHED)[span_17](start_span)[span_17](end_span)[span_18](start_span)[span_18](end_span)[span_19](start_span)[span_19](end_span)[span_20](start_span)[span_20](end_span)
+// EXACT MARKED EMBED & DROPDOWN (LUMIO SCREENSHOT MATCHED)
 // -------------------------------------------------------------
 function getMarkedLumioHelpEmbed() {
     return new EmbedBuilder()
-        .setColor(WHITE_ACCENT) // Screenshot-er vertical white line accent[span_21](start_span)[span_21](end_span)
-        .setTitle("Hey, I'm TEAM 1991 Dashboard")[span_22](start_span)[span_22](end_span)[span_23](start_span)[span_23](end_span)
-        .setThumbnail(client.user.displayAvatarURL({ dynamic: true }))[span_24](start_span)[span_24](end_span)[span_25](start_span)[span_25](end_span)
+        .setColor(WHITE_ACCENT)
+        .setTitle("Hey, I'm TEAM 1991 Dashboard")
+        .setThumbnail(client.user.displayAvatarURL({ dynamic: true }))
         .setDescription(`
 • **My prefix for this server is** \`${PREFIX}\`
 • **Type** \`${PREFIX}help [context]\` **for more**
@@ -236,15 +240,15 @@ function getMarkedLumioHelpEmbed() {
 🚩 » Control
 📋 » Logging
 \`\`\`
-        `)[span_26](start_span)[span_26](end_span)[span_27](start_span)[span_27](end_span)
-        .setFooter({ text: 'Powered by Arthur' });[span_28](start_span)[span_28](end_span)[span_29](start_span)[span_29](end_span)
+        `)
+        .setFooter({ text: 'Powered by Arthur' });
 }
 
 function getMarkedLumioDropdown() {
     const row = new ActionRowBuilder().addComponents(
         new StringSelectMenuBuilder()
             .setCustomId('select_marked_module')
-            .setPlaceholder('Select a module to see')[span_30](start_span)[span_30](end_span)[span_31](start_span)[span_31](end_span)[span_32](start_span)[span_32](end_span)[span_33](start_span)[span_33](end_span)
+            .setPlaceholder('Select a module to see')
             .addOptions([
                 { label: 'Moderation', value: 'mod_moderation', emoji: '🔨', description: '42 commands · Ban, mute, warn, and keep order.' },
                 { label: 'AutoMod', value: 'mod_automod', emoji: '🛡️', description: '18 commands · Automatic filters and raid protection.' },
@@ -263,13 +267,13 @@ function getMarkedLumioDropdown() {
                 { label: 'Configuration', value: 'mod_config', emoji: '⚙️', description: '54 commands · Set up prefixes, AI, premium, and more.' },
                 { label: 'Control', value: 'mod_control', emoji: '🚩', description: '27 commands · Restrict and delegate bot usage in this server.' },
                 { label: 'Logging', value: 'mod_logging', emoji: '📋', description: '5 commands · Audit logging for your server.' }
-            ])[span_34](start_span)[span_34](end_span)[span_35](start_span)[span_35](end_span)
+            ])
     );
     return [row];
 }
 
 function getMarkedSubDetailEmbed(key) {
-    const embed = new EmbedBuilder().setColor(WHITE_ACCENT).setFooter({ text: 'Powered by Arthur' });[span_36](start_span)[span_36](end_span)
+    const embed = new EmbedBuilder().setColor(WHITE_ACCENT).setFooter({ text: 'Powered by Arthur' });
     switch (key) {
         case 'mod_moderation':
             embed.setTitle('🔨 Moderation Suite')
@@ -277,7 +281,7 @@ function getMarkedSubDetailEmbed(key) {
             break;
         case 'mod_automod':
             embed.setTitle('🛡️ AutoMod Defense')
-                .setDescription('`Rautomod on`, `Rautomod off`, Anti-link and raid protection permanently active.');
+                .setDescription('`Rautomod on`, `Rautomod off`, Anti-link and raid protection active.');
             break;
         case 'mod_roles':
             embed.setTitle('🏷️ Role System')
@@ -287,21 +291,57 @@ function getMarkedSubDetailEmbed(key) {
             embed.setTitle('📁 Channel Controls')
                 .setDescription('`Rlock`, `Runlock`, `Rclear 20`');
             break;
+        case 'mod_nicknames':
+            embed.setTitle('✏️ Nicknames Module')
+                .setDescription('`Rsetnick @user <new_nick>`, `Rresetnick @user`');
+            break;
         case 'mod_voice':
             embed.setTitle('🔊 Voice Management')
                 .setDescription('`Rvckick @user`, `Rvcmute @user`, `Rvcunmute @user`');
+            break;
+        case 'mod_music':
+            embed.setTitle('🎵 Music System')
+                .setDescription('`Rplay <song>`, `Rstop`, `Rskip`, `Rpause`, `Rresume`');
+            break;
+        case 'mod_misc':
+            embed.setTitle('⚡ Miscellaneous Commands')
+                .setDescription('`Rafk [reason]`, `Rcalc [math]`, `Rcoinflip`, `Rroll`');
+            break;
+        case 'mod_tracking':
+            embed.setTitle('⏱️ Tracking & Leaderboard')
+                .setDescription('`Rtracking`, `Rleaderboard messages`, `Rinvites @user`');
+            break;
+        case 'mod_giveaways':
+            embed.setTitle('🎉 Giveaway Management')
+                .setDescription('`Rgiveaway [time] [prize]`, `Rgreroll`');
+            break;
+        case 'mod_welcome':
+            embed.setTitle('🧭 Welcome & Boosts')
+                .setDescription('`Rwelcome #channel`, `Rwelcome test`, `Rwelcome disable`');
+            break;
+        case 'mod_fun':
+            embed.setTitle('🐾 Fun & Roleplay')
+                .setDescription('`Rhug @user`, `Rkiss @user`, `Rslap @user`, `Rpunch @user`, `Rpat @user`, `Rmeme`, `Rcat`, `Rdog`');
+            break;
+        case 'mod_utility':
+            embed.setTitle('🔧 Utility Suite')
+                .setDescription('`Ravatar @user` (or `Rav`), `Ruserinfo @user` (or `Rui`), `Rcalc`, `Rafk`');
             break;
         case 'mod_info':
             embed.setTitle('❗ Information & Intel')
                 .setDescription('`Rserverinfo` (or `Rsi`), `Ruserinfo` (or `Rui`), `Ravatar` (or `Rav`), `Rbotinfo` (or `Rbi`), `Rstatus`, `Rping`');
             break;
-        case 'mod_fun':
-            embed.setTitle('🐾 Fun & Roleplay')
-                .setDescription('`Rhug @user`, `Rkiss @user`, `Rslap @user`, `Rpunch @user`, `Rpat @user`, `Rmeme`');
+        case 'mod_config':
+            embed.setTitle('⚙️ Configuration')
+                .setDescription('`Rantinuke enable/disable`, `Rwhitelist @user`, `Runwhitelist @user`, `Rwhitelisted`');
             break;
-        case 'mod_giveaways':
-            embed.setTitle('🎉 Giveaway Management')
-                .setDescription('`Rgiveaway [time] [prize]`');
+        case 'mod_control':
+            embed.setTitle('🚩 Server Control')
+                .setDescription('`Rlock`, `Runlock`, `Rclear`, `Rdashboard`');
+            break;
+        case 'mod_logging':
+            embed.setTitle('📋 Logging System')
+                .setDescription('`Rsetlogs #channel`, `Rlogs toggle`');
             break;
         default:
             embed.setTitle(`Module: ${key.replace('mod_', '').toUpperCase()}`)
@@ -312,12 +352,13 @@ function getMarkedSubDetailEmbed(key) {
 }
 
 // -------------------------------------------------------------
-// 100% PERMANENT WORKING COMMANDS (STRICTLY PREFIX 'R')[span_37](start_span)[span_37](end_span)[span_38](start_span)[span_38](end_span)
+// 100% PERMANENT COMMAND HANDLER (STRICTLY PREFIX 'R')
 // -------------------------------------------------------------
 client.on('messageCreate', async (message) => {
     try {
         if (message.author.bot || !message.guild) return;
 
+        // AutoMod Link Protection
         if (automodActive && !isImmune(message.guild, message.author.id)) {
             if (/(https?:\/\/[^\s]+|discord\.gg\/[^\s]+)/gi.test(message.content)) {
                 await message.delete().catch(() => {});
@@ -325,6 +366,7 @@ client.on('messageCreate', async (message) => {
             }
         }
 
+        // AFK Listener
         if (afkUsers.has(message.author.id)) {
             afkUsers.delete(message.author.id);
             message.reply('👋 Welcome back! AFK status removed.').then(m => setTimeout(() => m.delete(), 4000));
@@ -337,21 +379,22 @@ client.on('messageCreate', async (message) => {
 
         let content = message.content.trim();
         const mentionRegex = new RegExp(`^<@!?${client.user.id}>(?:\\s+)?`);
-        let prefixUsed = null;
+        let isCommand = false;
 
         if (mentionRegex.test(content)) {
-            prefixUsed = content.match(mentionRegex)[0];
+            content = content.replace(mentionRegex, '').trim();
+            isCommand = true;
         } else if (content.startsWith('R') || content.startsWith('r')) {
-            prefixUsed = content[0];
+            content = content.slice(1).trim();
+            isCommand = true;
         }
 
-        if (!prefixUsed) return;
+        if (!isCommand) return;
 
-        content = content.slice(prefixUsed.length).trim();
         const args = content.split(/ +/);
         const command = args.shift().toLowerCase();
 
-        // 1. HELP (Matches Screenshot 100%)[span_39](start_span)[span_39](end_span)[span_40](start_span)[span_40](end_span)
+        // 1. HELP (Screenshot Layout 100% Matched)
         if (command === 'help') {
             return message.reply({ embeds: [getMarkedLumioHelpEmbed()], components: getMarkedLumioDropdown() });
         }
@@ -365,7 +408,7 @@ client.on('messageCreate', async (message) => {
             return message.reply({ content: '🌐 **TEAM 1991 Command Matrix:**', components: [row] });
         }
 
-        // 3. ROLEPLAY ANIMATED GIFS (Direct Tenor Load)[span_41](start_span)[span_41](end_span)
+        // 3. ROLEPLAY ANIMATED GIFS (Tenor Load Guarantee)
         if (['hug', 'kiss', 'slap', 'punch', 'pat'].includes(command)) {
             const target = message.mentions.users.first();
             if (!target) return message.reply(`❌ Mention someone: \`R${command} @user\``);
@@ -386,19 +429,19 @@ client.on('messageCreate', async (message) => {
                 .setAuthor({ name: 'TEAM 1991 Roleplay', iconURL: client.user.displayAvatarURL() })
                 .setDescription(`🎭 **${message.author.username}** ${actions[command]} **${target.username}**!`)
                 .setImage(randomGif)
-                .setFooter({ text: 'Powered by Arthur' });[span_42](start_span)[span_42](end_span)
+                .setFooter({ text: 'Powered by Arthur' });
 
             return message.reply({ embeds: [embed] });
         }
 
-        // 4. FUNNY MEME
+        // 4. MEME
         if (command === 'meme') {
             const randomMeme = roleplayGifs.meme[Math.floor(Math.random() * roleplayGifs.meme.length)];
             const memeEmbed = new EmbedBuilder()
                 .setColor(WHITE_ACCENT)
                 .setTitle('😂 Random Funny Meme')
                 .setImage(randomMeme)
-                .setFooter({ text: 'Powered by Arthur' });[span_43](start_span)[span_43](end_span)
+                .setFooter({ text: 'Powered by Arthur' });
             return message.reply({ embeds: [memeEmbed] });
         }
 
@@ -453,7 +496,7 @@ client.on('messageCreate', async (message) => {
                     { name: 'Members', value: `\`${role.members.size}\``, inline: true },
                     { name: 'Position', value: `\`${role.position}\``, inline: true }
                 )
-                .setFooter({ text: 'Powered by Arthur' });[span_44](start_span)[span_44](end_span)
+                .setFooter({ text: 'Powered by Arthur' });
             if (role.iconURL()) embed.setThumbnail(role.iconURL({ size: 512 }));
             return message.reply({ embeds: [embed] });
         }
@@ -463,7 +506,7 @@ client.on('messageCreate', async (message) => {
             return message.reply(`📜 **Roles (${message.guild.roles.cache.size}):**\n${rolesList}...`);
         }
 
-        // 6. INTEL & STATUS (Rui, Rbotinfo, Rsi, Rping)[span_45](start_span)[span_45](end_span)[span_46](start_span)[span_46](end_span)[span_47](start_span)[span_47](end_span)
+        // 6. INTEL & STATUS (Rui, Rbotinfo, Rsi, Rping, Rstatus)[span_7](start_span)[span_7](end_span)[span_8](start_span)[span_8](end_span)[span_9](start_span)[span_9](end_span)
         if (command === 'userinfo' || command === 'ui') {
             const member = message.mentions.members.first() || message.guild.members.cache.get(args[0]) || message.member;
             const roles = member.roles.cache.filter(r => r.id !== message.guild.id).map(r => r).join(', ') || 'No Roles';
@@ -478,7 +521,7 @@ client.on('messageCreate', async (message) => {
                     { name: 'Account Created', value: `<t:${Math.floor(member.user.createdTimestamp / 1000)}:R>`, inline: true },
                     { name: `Roles [${member.roles.cache.size - 1}]`, value: roles.length > 1024 ? `${roles.substring(0, 1020)}...` : roles, inline: false }
                 )
-                .setFooter({ text: 'Powered by Arthur', iconURL: client.user.displayAvatarURL() });[span_48](start_span)[span_48](end_span)
+                .setFooter({ text: 'Powered by Arthur', iconURL: client.user.displayAvatarURL() });
             return message.reply({ embeds: [embed] });
         }
 
@@ -498,7 +541,27 @@ client.on('messageCreate', async (message) => {
                     { name: 'Active Uptime', value: `\`${hours}h ${mins}m\``, inline: true },
                     { name: 'Ping', value: `\`${Math.round(client.ws.ping)}ms\``, inline: true }
                 )
-                .setFooter({ text: 'Powered by Arthur', iconURL: client.user.displayAvatarURL() });[span_49](start_span)[span_49](end_span)
+                .setFooter({ text: 'Powered by Arthur', iconURL: client.user.displayAvatarURL() });
+            return message.reply({ embeds: [embed] });
+        }
+
+        if (command === 'status') {
+            const uptimeSec = Math.floor(process.uptime());
+            const hours = Math.floor(uptimeSec / 3600);
+            const mins = Math.floor((uptimeSec % 3600) / 60);
+
+            const embed = new EmbedBuilder()
+                .setColor(WHITE_ACCENT)
+                .setTitle('⚡ TEAM 1991 — Operational Status')
+                .addFields(
+                    { name: '🟢 Core Status', value: '`ONLINE 24/7`', inline: true },
+                    { name: '📡 Gateway Ping', value: `\`${Math.round(client.ws.ping)}ms\``, inline: true },
+                    { name: '⏳ Active Uptime', value: `\`${hours}h ${mins}m\``, inline: true },
+                    { name: '🛡️ Antinuke Defense', value: antinukeActive ? '`ARMED`' : '`DISARMED`', inline: true },
+                    { name: '🛠️ AutoMod', value: automodActive ? '`ACTIVE`' : '`DISABLED`', inline: true },
+                    { name: '🏰 Guilds', value: `\`${client.guilds.cache.size}\``, inline: true }
+                )
+                .setFooter({ text: 'Powered by Arthur', iconURL: client.user.displayAvatarURL() });
             return message.reply({ embeds: [embed] });
         }
 
@@ -515,7 +578,7 @@ Redis SET: 0ms
 Redis GET: 0ms
 Redis DEL: 0ms
                 `)
-                .setFooter({ text: 'Latency Status', iconURL: 'https://cdn.discordapp.com/emojis/1018934440056979506.png' });
+                .setFooter({ text: 'Latency Status' });
             return message.reply({ embeds: [pingEmbed] });
         }
 
@@ -535,8 +598,18 @@ Redis DEL: 0ms
 **Channels :** ${guild.channels.cache.size}
 **Roles :** ${guild.roles.cache.size}
                 `)
-                .setFooter({ text: `Requested By ${message.author.username} | Powered by Arthur`, iconURL: message.author.displayAvatarURL({ dynamic: true }) });[span_50](start_span)[span_50](end_span)
+                .setFooter({ text: `Requested By ${message.author.username} | Powered by Arthur`, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
             return message.reply({ embeds: [vipEmbed] });
+        }
+
+        if (command === 'avatar' || command === 'av') {
+            const target = message.mentions.users.first() || client.users.cache.get(args[0]) || message.author;
+            const embed = new EmbedBuilder()
+                .setColor(WHITE_ACCENT)
+                .setTitle(`🖼️ Avatar for ${target.tag}`)
+                .setImage(target.displayAvatarURL({ dynamic: true, size: 2048 }))
+                .setFooter({ text: 'Powered by Arthur', iconURL: client.user.displayAvatarURL() });
+            return message.reply({ embeds: [embed] });
         }
 
         // 7. MODERATION
@@ -583,6 +656,43 @@ Redis DEL: 0ms
             return message.reply(`🔊 Unmuted **${target.user.tag}**.`);
         }
 
+        if (command === 'lock') {
+            if (!message.member.permissions.has(PermissionsBitField.Flags.ManageChannels)) return message.reply('❌ Permission required!');
+            await message.channel.permissionOverwrites.edit(message.guild.roles.everyone, { SendMessages: false });
+            return message.reply('🔒 Channel locked.');
+        }
+
+        if (command === 'unlock') {
+            if (!message.member.permissions.has(PermissionsBitField.Flags.ManageChannels)) return message.reply('❌ Permission required!');
+            await message.channel.permissionOverwrites.edit(message.guild.roles.everyone, { SendMessages: true });
+            return message.reply('🔓 Channel unlocked.');
+        }
+
+        if (command === 'vckick') {
+            if (!message.member.permissions.has(PermissionsBitField.Flags.MoveMembers)) return message.reply('❌ Permission required!');
+            const target = message.mentions.members.first();
+            if (!target?.voice.channel) return message.reply('User must be in VC.');
+            await target.voice.disconnect();
+            return message.reply(`🔌 Disconnected **${target.user.tag}** from VC.`);
+        }
+
+        if (command === 'vcmute') {
+            if (!message.member.permissions.has(PermissionsBitField.Flags.MuteMembers)) return message.reply('❌ Permission required!');
+            const target = message.mentions.members.first();
+            if (!target?.voice.channel) return message.reply('User must be in VC.');
+            await target.voice.setMute(true);
+            return message.reply(`🔇 Voice-muted **${target.user.tag}**.`);
+        }
+
+        if (command === 'vcunmute') {
+            if (!message.member.permissions.has(PermissionsBitField.Flags.MuteMembers)) return message.reply('❌ Permission required!');
+            const target = message.mentions.members.first();
+            if (!target?.voice.channel) return message.reply('User must be in VC.');
+            await target.voice.setMute(false);
+            return message.reply(`🔊 Voice-unmuted **${target.user.tag}**.`);
+        }
+
+        // 8. ANTINUKE & WHITELIST (Owner Restricted)
         if (command === 'antinuke') {
             if (message.author.id !== message.guild.ownerId) return message.reply('❌ Only Server Owner can toggle Antinuke!');
             const act = args[0]?.toLowerCase();
@@ -590,12 +700,47 @@ Redis DEL: 0ms
             return message.reply(`⚔️ Antinuke Status: **${antinukeActive ? 'ARMED' : 'DISARMED'}**`);
         }
 
+        if (command === 'whitelist') {
+            if (message.author.id !== message.guild.ownerId) return message.reply('❌ Only Server Owner can whitelist!');
+            const target = message.mentions.members.first();
+            if (!target) return message.reply('Mention member: `Rwhitelist @user`');
+            whitelistedUsers.add(target.id);
+            return message.reply(`🛡️ Whitelisted **${target.user.tag}**.`);
+        }
+
+        if (command === 'unwhitelist') {
+            if (message.author.id !== message.guild.ownerId) return message.reply('❌ Only Server Owner can unwhitelist!');
+            const target = message.mentions.members.first();
+            if (!target) return message.reply('Mention member: `Runwhitelist @user`');
+            whitelistedUsers.delete(target.id);
+            return message.reply(`🔓 Removed **${target.user.tag}** from Whitelist.`);
+        }
+
+        if (command === 'whitelisted') {
+            if (whitelistedUsers.size === 0) return message.reply('🔒 No users currently whitelisted.');
+            return message.reply(`🔒 **Whitelisted Members:** ${Array.from(whitelistedUsers).map(id => `<@${id}>`).join(', ')}`);
+        }
+
+        // 9. EXTRA COMMANDS
+        if (command === 'cat') return message.reply({ embeds: [new EmbedBuilder().setColor(WHITE_ACCENT).setImage('https://cataas.com/cat').setFooter({ text: 'Powered by Arthur' })] });
+        if (command === 'dog') return message.reply({ embeds: [new EmbedBuilder().setColor(WHITE_ACCENT).setImage('https://placedog.net/600/450?random').setFooter({ text: 'Powered by Arthur' })] });
+        if (command === 'giveaway') {
+            const prize = args.slice(1).join(' ') || 'VIP Nitro';
+            const embed = new EmbedBuilder()
+                .setColor(WHITE_ACCENT)
+                .setTitle('🎉 OFFICIAL VIP GIVEAWAY 🎉')
+                .setDescription(`**Prize:** ${prize}\n**Hosted By:** ${message.author}\n\nReact with 🎁 to participate!`)
+                .setFooter({ text: 'Powered by Arthur' });
+            const sent = await message.channel.send({ embeds: [embed] });
+            return sent.react('🎁');
+        }
+
     } catch (err) {
         console.error('Command Error:', err);
     }
 });
 
-// Dropdown Interaction Handler (Matches Screenshot)[span_51](start_span)[span_51](end_span)[span_52](start_span)[span_52](end_span)[span_53](start_span)[span_53](end_span)
+// Dropdown Interaction Handler (Matches Screenshot)
 client.on('interactionCreate', async (interaction) => {
     if (!interaction.isStringSelectMenu()) return;
     if (interaction.customId === 'select_marked_module') {
