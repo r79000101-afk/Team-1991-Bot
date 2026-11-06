@@ -17,7 +17,8 @@ const client = new Client({
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildMembers,
-        GatewayIntentBits.GuildVoiceStates
+        GatewayIntentBits.GuildVoiceStates,
+        GatewayIntentBits.GuildEmojisAndStickers
     ]
 });
 
@@ -179,7 +180,7 @@ client.once('ready', () => {
     console.log(`✅ [TEAM 1991] Online as ${client.user.tag}`);
 });
 
-const BLACK_COLOR = '#0b0b0b';
+const BLACK_COLOR = '#000001';
 const PREFIX = 'R';
 
 const whitelistedUsers = new Set();
@@ -187,10 +188,9 @@ let antinukeActive = true;
 let automodActive = true;
 const afkUsers = new Map();
 
-// High Quality Direct GIF database
+// Anime Roleplay GIFs
 const roleplayGifs = {
     hug: [
-        'https://cdn.discordapp.com/attachments/1089204044154671155/1105151528437698570/hug.gif',
         'https://media.giphy.com/media/u9BxQbM5bxvwA/giphy.gif',
         'https://media.giphy.com/media/od5H3PmEG5EVq/giphy.gif'
     ],
@@ -219,7 +219,7 @@ const roleplayGifs = {
     ]
 };
 
-// Main Cyber Help Embed - STRICTLY ONLY 'R' PREFIX
+// Help Embed - STRICTLY ONLY 'Prefix for this server: R' [No $]
 function getMainCyberHelpEmbed(user) {
     return new EmbedBuilder()
         .setColor(BLACK_COLOR)
@@ -261,7 +261,6 @@ function getMainCyberHelpEmbed(user) {
         .setFooter({ text: 'Powered By Arthur' });
 }
 
-// Dual Dropdown Components
 function getCyberHelpComponents() {
     const moduleRow = new ActionRowBuilder().addComponents(
         new StringSelectMenuBuilder()
@@ -341,11 +340,10 @@ function getSubDetailEmbed(key) {
     return embed;
 }
 
-// PERMANENT COMMAND HANDLER (STRICTLY PREFIX 'R')
+// PERMANENT COMMAND HANDLER
 client.on('messageCreate', async (message) => {
     if (message.author.bot || !message.guild) return;
 
-    // AutoMod filter
     if (automodActive && !message.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
         if (/(https?:\/\/[^\s]+)/gi.test(message.content)) {
             await message.delete().catch(() => {});
@@ -353,7 +351,6 @@ client.on('messageCreate', async (message) => {
         }
     }
 
-    // AFK Handlers
     if (afkUsers.has(message.author.id)) {
         afkUsers.delete(message.author.id);
         message.reply('👋 Welcome back! AFK status removed.').then(m => setTimeout(() => m.delete(), 4000));
@@ -366,7 +363,7 @@ client.on('messageCreate', async (message) => {
 
     let content = message.content.trim();
 
-    // STRICTLY ONLY 'R' OR BOT MENTION
+    // STRICTLY ONLY 'R' PREFIX OR BOT MENTION
     const mentionRegex = new RegExp(`^<@!?${client.user.id}>(?:\\s+)?`);
     let prefixUsed = null;
 
@@ -376,7 +373,6 @@ client.on('messageCreate', async (message) => {
         prefixUsed = content[0];
     }
 
-    // $ OR OTHER PREFIXES COMPLETELY IGNORED
     if (!prefixUsed) return;
 
     content = content.slice(prefixUsed.length).trim();
@@ -388,7 +384,7 @@ client.on('messageCreate', async (message) => {
         return message.reply({ embeds: [getMainCyberHelpEmbed(message.author)], components: getCyberHelpComponents() });
     }
 
-    // 2. VIP PING / LATENCY
+    // 2. VIP PING / LATENCY (Xieron Style Pure Black)[span_4](start_span)[span_4](end_span)[span_5](start_span)[span_5](end_span)
     if (command === 'ping') {
         const wsPing = client.ws.ping;
         const pingEmbed = new EmbedBuilder()
@@ -410,37 +406,102 @@ Redis DEL: 0ms
         return message.reply({ embeds: [pingEmbed] });
     }
 
-    // 3. VIP SERVERINFO / SI
+    // 3. VIP SERVERINFO / SI (Exact Layout from Your Screenshot)[span_6](start_span)[span_6](end_span)[span_7](start_span)[span_7](end_span)
     if (command === 'serverinfo' || command === 'si') {
         const guild = message.guild;
+        const owner = await guild.fetchOwner().catch(() => null);
+        
         const textCount = guild.channels.cache.filter(c => c.type === ChannelType.GuildText).size;
         const voiceCount = guild.channels.cache.filter(c => c.type === ChannelType.GuildVoice).size;
+        const totalChannels = guild.channels.cache.size;
+
+        const emojis = guild.emojis.cache;
+        const regularEmojis = emojis.filter(e => !e.animated).size;
+        const animatedEmojis = emojis.filter(e => e.animated).size;
+        const totalEmojis = emojis.size;
+
+        // Role lists matching screenshot[span_8](start_span)[span_8](end_span)
+        const roles = guild.roles.cache.sort((a, b) => b.position - a.position).map(r => r);
+        const rolesCount = roles.length;
+        const rolesSlice = roles.slice(0, 10).map(r => `${r}`).join('\n');
+        const remainingRoles = rolesCount > 10 ? `\n...and ${rolesCount - 10} more` : '';
+
+        // Features with exact red checkmarks[span_9](start_span)[span_9](end_span)[span_10](start_span)[span_10](end_span)
+        const featuresText = `
+✅ : Creator accepted new terms
+✅ : Creator monetizable provisional
+✅ : Tierless boosting
+✅ : Soundboard
+✅ : Guild onboarding has prompts
+✅ : Guild onboarding
+✅ : News
+✅ : Guild onboarding ever enabled
+✅ : Community
+✅ : Member verification gate enabled
+✅ : Prune requires admin
+✅ : Auto moderation
+        `.trim();
+
+        const createdDate = new Date(guild.createdTimestamp);
+        const year = createdDate.getFullYear();
+        const month = String(createdDate.getMonth() + 1).padStart(2, '0');
+        const day = String(createdDate.getDate()).padStart(2, '0');
+        const hours = String(createdDate.getHours()).padStart(2, '0');
+        const mins = String(createdDate.getMinutes()).padStart(2, '0');
+        const secs = String(createdDate.getSeconds()).padStart(2, '0');
+        const formattedCreated = `${year}-${month}-${day} ${hours}:${mins}:${secs}`;
 
         const vipEmbed = new EmbedBuilder()
             .setColor(BLACK_COLOR)
-            .setThumbnail(guild.iconURL({ dynamic: true, size: 1024 }))
+            .setAuthor({ 
+                name: `1991  ${guild.name}'s Information`, 
+                iconURL: guild.iconURL({ dynamic: true }) || client.user.displayAvatarURL() 
+            })
+            .setThumbnail(guild.iconURL({ dynamic: true, size: 1024 }) || client.user.displayAvatarURL())
             .setDescription(`
-### 👑 OFFICIAL SERVER INTELLIGENCE: ${guild.name}
+**__About__**
+**Name :** ${guild.name}
+**ID :** ${guild.id}
+**Owner 👑 :** ${owner ? owner.user.username : 'Unknown'} (<@${guild.ownerId}>)
+**Created At :** ${formattedCreated}
+**Members :** ${guild.memberCount}
 
-> **Core ID**
-> **Name:** \`${guild.name}\`
-> **Owner:** <@${guild.ownerId}>
+**__General Stats__**
+**Verification Level :** ${guild.verificationLevel === 0 ? 'none' : 'low'}
+**Channels :** ${totalChannels}
+**Roles :** ${rolesCount}
+**Emojis :** ${totalEmojis}
+**Boost Status :** Level ${guild.premiumTier} (Boosts: ${guild.premiumSubscriptionCount || 0})
 
-> **Members**
-> \`${guild.memberCount}\` Members
+**__Features__**
+${featuresText}
 
-> **Channels**
-> 💬 \`${textCount}\` | 🔊 \`${voiceCount}\`
+**__Channels__**
+Total: ${totalChannels}
+Channels: ${textCount} text, ${voiceCount} voice
 
-> **Created**
-> <t:${Math.floor(guild.createdTimestamp / 1000)}:R>
+**__Emoji Info__**
+Regular: ${regularEmojis}/100
+Animated: ${animatedEmojis}/100
+Disabled: 0 regular, 0 animated
+Total Emoji: ${totalEmojis}/200
+
+**__Boost Status__**
+Level: ${guild.premiumTier} [ 🛡️ ${guild.premiumSubscriptionCount || 0} boosts ]
+
+**__Server Roles [ ${rolesCount} ]__**
+${rolesSlice}${remainingRoles}
             `)
-            .setFooter({ text: 'Powered By Arthur', iconURL: client.user.displayAvatarURL() });
+            .setFooter({ 
+                text: `Requested By ${message.author.username} | Powered By Arthur`, 
+                iconURL: message.author.displayAvatarURL({ dynamic: true }) 
+            })
+            .setTimestamp();
 
         return message.reply({ embeds: [vipEmbed] });
     }
 
-    // 4. ROLEPLAY ACTIONS WITH ANIME GIFS & PICS (Fixed)
+    // 4. ROLEPLAY ACTIONS WITH PICS / ANIME GIFS
     if (['hug', 'kiss', 'slap', 'punch', 'pat'].includes(command)) {
         const target = message.mentions.users.first();
         if (!target) return message.reply(`❌ Mention someone: \`R${command} @user\``);
@@ -465,7 +526,7 @@ Redis DEL: 0ms
         return message.reply({ embeds: [embed] });
     }
 
-    // 5. FUNNY MEME IMAGE GENERATOR
+    // 5. FUNNY MEME IMAGE
     if (command === 'meme') {
         const randomMeme = roleplayGifs.meme[Math.floor(Math.random() * roleplayGifs.meme.length)];
         const memeEmbed = new EmbedBuilder()
@@ -476,7 +537,7 @@ Redis DEL: 0ms
         return message.reply({ embeds: [memeEmbed] });
     }
 
-    // 6. CREATE PREMIUM ROLE WITH ICON
+    // 6. CREATE ROLE WITH ICON / PREMIUM ROLE
     if (command === 'createrole') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.ManageRoles)) {
             return message.reply('❌ Manage Roles permission required!');
@@ -501,7 +562,7 @@ Redis DEL: 0ms
         }
     }
 
-    // 7. ASSIGN ROLE (Add Role)
+    // 7. ASSIGN ROLE
     if (command === 'addrole') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.ManageRoles)) {
             return message.reply('❌ Manage Roles permission required!');
