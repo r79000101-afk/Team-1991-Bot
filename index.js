@@ -21,7 +21,7 @@ const client = new Client({
     ]
 });
 
-// VIP Ultra-Luxury Cyberpunk Dashboard
+// ULTRA VIP MODERN CYBER GLASS DASHBOARD
 app.get('/', (req, res) => {
     const uptimeSec = Math.floor(process.uptime());
     const days = Math.floor(uptimeSec / 86400);
@@ -34,146 +34,145 @@ app.get('/', (req, res) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>TEAM 1991 || VIP Control Matrix</title>
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+        <title>TEAM 1991 — VIP Command Matrix</title>
+        <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
         <style>
             * { box-sizing: border-box; margin: 0; padding: 0; }
             body { 
-                font-family: 'Plus Jakarta Sans', sans-serif; 
-                background: #020617; 
+                font-family: 'Space Grotesk', sans-serif; 
+                background: #030712; 
                 background-image: 
-                    radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.15) 0%, transparent 40%),
-                    radial-gradient(circle at 90% 80%, rgba(245, 158, 11, 0.15) 0%, transparent 40%),
-                    radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 60%);
+                    radial-gradient(at 10% 10%, rgba(245, 158, 11, 0.18) 0px, transparent 50%),
+                    radial-gradient(at 90% 90%, rgba(56, 189, 248, 0.18) 0px, transparent 50%),
+                    radial-gradient(at 50% 50%, rgba(139, 92, 246, 0.12) 0px, transparent 60%);
                 color: #f8fafc; 
                 display: flex; 
                 justify-content: center; 
                 align-items: center; 
                 min-height: 100vh; 
-                padding: 24px; 
+                padding: 20px; 
             }
-            .vip-card { 
-                background: rgba(15, 23, 42, 0.65); 
-                backdrop-filter: blur(25px); 
-                -webkit-backdrop-filter: blur(25px);
-                border: 1px solid rgba(255, 255, 255, 0.08); 
-                border-radius: 28px; 
-                max-width: 620px; 
-                width: 100%; 
-                padding: 48px 36px; 
-                text-align: center; 
-                box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8), 0 0 50px rgba(56, 189, 248, 0.12);
+            .vip-shell {
+                background: rgba(15, 23, 42, 0.85);
+                backdrop-filter: blur(28px);
+                -webkit-backdrop-filter: blur(28px);
+                border: 1px solid rgba(245, 158, 11, 0.35);
+                border-radius: 28px;
+                max-width: 640px;
+                width: 100%;
+                padding: 44px 34px;
+                text-align: center;
+                box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(245, 158, 11, 0.15);
                 position: relative;
                 overflow: hidden;
             }
-            .vip-card::before {
+            .vip-shell::before {
                 content: '';
                 position: absolute;
                 top: 0; left: 0; right: 0;
-                height: 3px;
-                background: linear-gradient(90deg, #38bdf8, #f59e0b, #ec4899);
+                height: 4px;
+                background: linear-gradient(90deg, #f59e0b, #38bdf8, #ec4899);
             }
-            .status-pill { 
-                display: inline-flex; 
-                align-items: center; 
-                gap: 8px; 
-                background: rgba(34, 197, 94, 0.12); 
-                border: 1px solid rgba(34, 197, 94, 0.4); 
-                color: #4ade80; 
-                padding: 6px 20px; 
-                border-radius: 9999px; 
-                font-size: 12px; 
-                font-weight: 800; 
-                letter-spacing: 1.2px;
+            .badge-live {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                background: rgba(34, 197, 94, 0.14);
+                border: 1px solid #22c55e;
+                color: #4ade80;
+                padding: 6px 18px;
+                border-radius: 9999px;
+                font-size: 12px;
+                font-weight: 700;
+                letter-spacing: 1px;
                 text-transform: uppercase;
-                margin-bottom: 24px; 
+                margin-bottom: 22px;
             }
-            .pulse-dot { 
-                width: 8px; 
-                height: 8px; 
-                background: #4ade80; 
-                border-radius: 50%; 
-                box-shadow: 0 0 14px #4ade80; 
+            .dot-pulse {
+                width: 8px;
+                height: 8px;
+                background: #22c55e;
+                border-radius: 50%;
+                box-shadow: 0 0 12px #22c55e;
             }
-            h1 { 
-                font-size: 34px; 
-                font-weight: 800; 
+            h1 {
+                font-size: 34px;
+                font-weight: 800;
                 letter-spacing: -0.5px;
-                background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+                background: linear-gradient(135deg, #f59e0b 0%, #ffffff 80%);
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
-                margin-bottom: 12px; 
+                margin-bottom: 8px;
             }
-            p.sub { 
-                font-size: 14px; 
-                color: #94a3b8; 
-                margin-bottom: 34px; 
+            p.sub {
+                font-size: 14px;
+                color: #94a3b8;
+                margin-bottom: 30px;
                 line-height: 1.6;
             }
-            .stats-grid { 
-                display: grid; 
-                grid-template-columns: repeat(3, 1fr); 
-                gap: 16px; 
-                margin-bottom: 34px;
+            .matrix-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 14px;
+                margin-bottom: 30px;
             }
-            .stat-box { 
-                background: rgba(30, 41, 59, 0.4); 
-                padding: 20px 14px; 
-                border-radius: 18px; 
-                border: 1px solid rgba(255, 255, 255, 0.05); 
-                transition: transform 0.25s ease, border-color 0.25s ease;
+            .matrix-card {
+                background: rgba(30, 41, 59, 0.55);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                padding: 18px 12px;
+                border-radius: 16px;
+                transition: transform 0.2s, border-color 0.2s;
             }
-            .stat-box:hover {
-                transform: translateY(-3px);
-                border-color: rgba(56, 189, 248, 0.4);
+            .matrix-card:hover {
+                transform: translateY(-2px);
+                border-color: rgba(245, 158, 11, 0.6);
             }
-            .stat-box h3 { 
-                font-size: 24px; 
-                font-weight: 700;
-                color: #38bdf8; 
+            .matrix-card h3 {
+                font-size: 22px;
                 font-family: 'JetBrains Mono', monospace;
-                margin-bottom: 4px; 
+                color: #38bdf8;
+                margin-bottom: 4px;
             }
-            .stat-box span { 
-                font-size: 11px; 
-                color: #64748b; 
+            .matrix-card span {
+                font-size: 11px;
+                color: #64748b;
                 text-transform: uppercase;
                 font-weight: 700;
-                letter-spacing: 0.6px;
+                letter-spacing: 0.8px;
             }
-            .powered { 
-                font-size: 13px; 
-                color: #94a3b8; 
+            .footer-vip {
+                font-size: 13px;
+                color: #cbd5e1;
                 font-weight: 600;
-                padding-top: 24px;
-                border-top: 1px solid rgba(255, 255, 255, 0.06);
+                padding-top: 22px;
+                border-top: 1px solid rgba(255, 255, 255, 0.08);
             }
-            .powered span {
+            .footer-vip span {
                 color: #f59e0b;
-                font-weight: 700;
+                font-weight: 800;
             }
         </style>
     </head>
     <body>
-        <div class="vip-card">
-            <div class="status-pill"><div class="pulse-dot"></div> VIP Node Active 24/7</div>
+        <div class="vip-shell">
+            <div class="badge-live"><div class="dot-pulse"></div> VIP Defense Core Active</div>
             <h1>TEAM 1991</h1>
-            <p class="sub">Autonomous Defense Grid, Server Intelligence & High-Tier Moderation Matrix</p>
-            <div class="stats-grid">
-                <div class="stat-box">
+            <p class="sub">Autonomous Defense Protocol, Server Intelligence & Enterprise Moderation Network Active 24/7</p>
+            <div class="matrix-grid">
+                <div class="matrix-card">
                     <h3>${client.guilds?.cache?.size || 0}</h3>
                     <span>Guilds Guarded</span>
                 </div>
-                <div class="stat-box">
+                <div class="matrix-card">
                     <h3>${Math.round(client.ws?.ping) || 0}ms</h3>
                     <span>Gateway Ping</span>
                 </div>
-                <div class="stat-box">
+                <div class="matrix-card">
                     <h3>${days > 0 ? days + 'd ' : ''}${hours}h ${mins}m</h3>
                     <span>Active Uptime</span>
                 </div>
             </div>
-            <div class="powered">Powered By <span>Arthur</span></div>
+            <div class="footer-vip">Powered By <span>Arthur</span></div>
         </div>
     </body>
     </html>
@@ -186,7 +185,7 @@ app.listen(PORT, '0.0.0.0', () => {
 });
 
 client.once('ready', () => {
-    console.log(`✅ [TEAM 1991] Logged in as ${client.user.tag}`);
+    console.log(`✅ [TEAM 1991] Online as ${client.user.tag}`);
 });
 
 // Storage Variables
@@ -198,7 +197,7 @@ const afkUsers = new Map();
 // Main Cyber Help Embed
 function getMainCyberHelpEmbed(user) {
     return new EmbedBuilder()
-        .setColor('#2b2d31')
+        .setColor('#f59e0b')
         .setTitle('Hello, I\'m TEAM 1991')
         .setThumbnail(client.user.displayAvatarURL({ dynamic: true }))
         .setDescription(`
@@ -284,9 +283,8 @@ function getCyberHelpComponents() {
     return [moduleRow, categoryRow];
 }
 
-// Dropdown Module Descriptions
 function getSubDetailEmbed(key) {
-    const embed = new EmbedBuilder().setColor('#2b2d31').setFooter({ text: 'Powered By Arthur' });
+    const embed = new EmbedBuilder().setColor('#f59e0b').setFooter({ text: 'Powered By Arthur' });
 
     switch (key) {
         case 'mod_moderation':
@@ -327,7 +325,7 @@ function getSubDetailEmbed(key) {
             break;
         case 'mod_utility':
             embed.setTitle('🔧 Utility Suite')
-                .setDescription('`Rping`, `Rstatus`, `Rserverinfo`, `Ruserinfo`, `Ravatar`, `Rbotinfo`, `Rcalc 5*5`');
+                .setDescription('`Rping`, `Rstatus`, `Rserverinfo` (or `Rsi`), `Ruserinfo`, `Ravatar`, `Rbotinfo`, `Rcalc 5*5`');
             break;
         case 'cat_animals':
             embed.setTitle('🐾 Animals Module')
@@ -335,11 +333,11 @@ function getSubDetailEmbed(key) {
             break;
         case 'cat_giveaway':
             embed.setTitle('🎁 Giveaway Operations')
-                .setDescription('`Rgiveaway [time] [prize]` (e.g. `Rgiveaway 10m Nitro`)');
+                .setDescription('`Rgiveaway [time] [prize]` (Example: `Rgiveaway 10m Nitro`)');
             break;
         case 'cat_misc':
             embed.setTitle('🧭 Misc Commands')
-                .setDescription('`Rafk [reason]`, `Rcalc [expression]`');
+                .setDescription('`Rafk [reason]`, `Rcalc [math]`');
             break;
         case 'cat_voice':
             embed.setTitle('🎤 Voice Management')
@@ -347,7 +345,7 @@ function getSubDetailEmbed(key) {
             break;
         case 'cat_ai':
             embed.setTitle('⚛️ Artificial Intelligence')
-                .setDescription('`Rai [prompt]` (Example: `Rai write a discord greeting`)');
+                .setDescription('`Rai [prompt]` (Example: `Rai hello`)');
             break;
         default:
             embed.setTitle(`Module: ${key.replace(/(mod_|cat_)/, '').toUpperCase()}`)
@@ -357,11 +355,11 @@ function getSubDetailEmbed(key) {
     return embed;
 }
 
-// Command Handler
+// COMMAND HANDLER
 client.on('messageCreate', async (message) => {
     if (message.author.bot || !message.guild) return;
 
-    // AutoMod anti-link check
+    // AutoMod filter
     if (automodActive && !message.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
         if (/(https?:\/\/[^\s]+)/gi.test(message.content)) {
             await message.delete().catch(() => {});
@@ -369,7 +367,7 @@ client.on('messageCreate', async (message) => {
         }
     }
 
-    // AFK mentions check
+    // AFK Handler
     if (afkUsers.has(message.author.id)) {
         afkUsers.delete(message.author.id);
         message.reply('👋 Welcome back! AFK status removed.').then(m => setTimeout(() => m.delete(), 4000));
@@ -415,7 +413,7 @@ client.on('messageCreate', async (message) => {
         const mins = Math.floor((uptimeSec % 3600) / 60);
 
         const embed = new EmbedBuilder()
-            .setColor('#38bdf8')
+            .setColor('#f59e0b')
             .setTitle('⚡ TEAM 1991 — Operational Status')
             .addFields(
                 { name: '🟢 Core Status', value: '`ONLINE 24/7`', inline: true },
@@ -435,7 +433,7 @@ client.on('messageCreate', async (message) => {
         const roles = member.roles.cache.filter(r => r.id !== message.guild.id).map(r => r).join(', ') || 'No Roles';
 
         const embed = new EmbedBuilder()
-            .setColor('#38bdf8')
+            .setColor('#f59e0b')
             .setTitle(`👤 User Intelligence: ${member.user.tag}`)
             .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 512 }))
             .addFields(
@@ -455,7 +453,7 @@ client.on('messageCreate', async (message) => {
         const avatarURL = target.displayAvatarURL({ dynamic: true, size: 2048 });
 
         const embed = new EmbedBuilder()
-            .setColor('#38bdf8')
+            .setColor('#f59e0b')
             .setTitle(`🖼️ Avatar for ${target.tag}`)
             .setImage(avatarURL)
             .setDescription(`[Direct Link](${avatarURL})`)
@@ -479,7 +477,7 @@ client.on('messageCreate', async (message) => {
         return message.reply({ embeds: [embed] });
     }
 
-    // 7. SERVERINFO / SI
+    // 7. VIP SERVERINFO / SI
     if (command === 'serverinfo' || command === 'si') {
         const guild = message.guild;
         const textCount = guild.channels.cache.filter(c => c.type === ChannelType.GuildText).size;
@@ -501,9 +499,7 @@ client.on('messageCreate', async (message) => {
 
     // 8. AUTOMOD COMMANDS
     if (command === 'automod') {
-        if (!message.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-            return message.reply('❌ Admin permission required!');
-        }
+        if (!message.member.permissions.has(PermissionsBitField.Flags.Administrator)) return message.reply('❌ Admin permission required!');
         const state = args[0]?.toLowerCase();
         if (state === 'on' || state === 'enable') {
             automodActive = true;
@@ -537,7 +533,7 @@ client.on('messageCreate', async (message) => {
                 return message.reply('❌ Only usable inside a ticket channel.');
             }
         } else {
-            return message.reply('🎫 Usage: `Rticket setup` or `Rticket close`');
+            return message.reply('🎫 Usage: \`Rticket setup\` or \`Rticket close\`');
         }
     }
 
@@ -619,7 +615,7 @@ client.on('messageCreate', async (message) => {
     if (command === 'ai') {
         const prompt = args.join(' ');
         if (!prompt) return message.reply('❌ Provide a prompt: `Rai hello`');
-        return message.reply(`🤖 **TEAM 1991 AI:** I received your prompt: *"${prompt}"*. Matrix response operational.`);
+        return message.reply(`🤖 **TEAM 1991 AI:** Response matrix active for prompt: *"${prompt}"*.`);
     }
 
     // 16. GIVEAWAY
@@ -628,7 +624,7 @@ client.on('messageCreate', async (message) => {
         return message.channel.send(`🎉 **GIVEAWAY STARTED!** 🎉\nPrize: **${prize}**\nReact with 🎁 to enter! Hosted by ${message.author}`).then(m => m.react('🎁'));
     }
 
-    // 17. MODERATION (BAN, KICK, MUTE, UNMUTE, CLEAR, LOCK, UNLOCK)
+    // 17. MODERATION
     if (command === 'clear' || command === 'purge') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) return message.reply('❌ Permission required!');
         const amount = parseInt(args[0]) || 10;
