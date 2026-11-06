@@ -21,10 +21,11 @@ const client = new Client({
     ]
 });
 
-// VIP Ultra-Modern Futuristic Dashboard
+// VIP Ultra-Luxury Cyberpunk Dashboard
 app.get('/', (req, res) => {
     const uptimeSec = Math.floor(process.uptime());
-    const hours = Math.floor(uptimeSec / 3600);
+    const days = Math.floor(uptimeSec / 86400);
+    const hours = Math.floor((uptimeSec % 86400) / 3600);
     const mins = Math.floor((uptimeSec % 3600) / 60);
 
     res.send(`
@@ -33,16 +34,17 @@ app.get('/', (req, res) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>TEAM 1991 || Official Control Matrix</title>
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+        <title>TEAM 1991 || VIP Control Matrix</title>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
         <style>
             * { box-sizing: border-box; margin: 0; padding: 0; }
             body { 
                 font-family: 'Plus Jakarta Sans', sans-serif; 
-                background: #030712; 
+                background: #020617; 
                 background-image: 
-                    radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.18) 0px, transparent 50%),
-                    radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.15) 0px, transparent 50%);
+                    radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.15) 0%, transparent 40%),
+                    radial-gradient(circle at 90% 80%, rgba(245, 158, 11, 0.15) 0%, transparent 40%),
+                    radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 60%);
                 color: #f8fafc; 
                 display: flex; 
                 justify-content: center; 
@@ -50,39 +52,39 @@ app.get('/', (req, res) => {
                 min-height: 100vh; 
                 padding: 24px; 
             }
-            .dashboard-card { 
-                background: rgba(15, 23, 42, 0.75); 
-                backdrop-filter: blur(20px); 
-                -webkit-backdrop-filter: blur(20px);
+            .vip-card { 
+                background: rgba(15, 23, 42, 0.65); 
+                backdrop-filter: blur(25px); 
+                -webkit-backdrop-filter: blur(25px);
                 border: 1px solid rgba(255, 255, 255, 0.08); 
-                border-radius: 24px; 
-                max-width: 580px; 
+                border-radius: 28px; 
+                max-width: 620px; 
                 width: 100%; 
-                padding: 44px 32px; 
+                padding: 48px 36px; 
                 text-align: center; 
-                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 40px rgba(59, 130, 246, 0.12);
+                box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8), 0 0 50px rgba(56, 189, 248, 0.12);
                 position: relative;
                 overflow: hidden;
             }
-            .dashboard-card::before {
+            .vip-card::before {
                 content: '';
                 position: absolute;
                 top: 0; left: 0; right: 0;
                 height: 3px;
-                background: linear-gradient(90deg, #3b82f6, #f59e0b, #ef4444);
+                background: linear-gradient(90deg, #38bdf8, #f59e0b, #ec4899);
             }
-            .status-badge { 
+            .status-pill { 
                 display: inline-flex; 
                 align-items: center; 
                 gap: 8px; 
                 background: rgba(34, 197, 94, 0.12); 
-                border: 1px solid rgba(34, 197, 94, 0.35); 
+                border: 1px solid rgba(34, 197, 94, 0.4); 
                 color: #4ade80; 
-                padding: 6px 18px; 
+                padding: 6px 20px; 
                 border-radius: 9999px; 
-                font-size: 13px; 
-                font-weight: 700; 
-                letter-spacing: 0.8px;
+                font-size: 12px; 
+                font-weight: 800; 
+                letter-spacing: 1.2px;
                 text-transform: uppercase;
                 margin-bottom: 24px; 
             }
@@ -91,44 +93,45 @@ app.get('/', (req, res) => {
                 height: 8px; 
                 background: #4ade80; 
                 border-radius: 50%; 
-                box-shadow: 0 0 12px #4ade80; 
+                box-shadow: 0 0 14px #4ade80; 
             }
             h1 { 
-                font-size: 32px; 
+                font-size: 34px; 
                 font-weight: 800; 
                 letter-spacing: -0.5px;
-                background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+                background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
-                margin-bottom: 10px; 
+                margin-bottom: 12px; 
             }
-            p.desc { 
+            p.sub { 
                 font-size: 14px; 
                 color: #94a3b8; 
-                margin-bottom: 32px; 
+                margin-bottom: 34px; 
                 line-height: 1.6;
             }
-            .stats-container { 
+            .stats-grid { 
                 display: grid; 
                 grid-template-columns: repeat(3, 1fr); 
                 gap: 16px; 
-                margin-bottom: 30px;
+                margin-bottom: 34px;
             }
             .stat-box { 
-                background: rgba(30, 41, 59, 0.5); 
-                padding: 18px 12px; 
-                border-radius: 16px; 
+                background: rgba(30, 41, 59, 0.4); 
+                padding: 20px 14px; 
+                border-radius: 18px; 
                 border: 1px solid rgba(255, 255, 255, 0.05); 
-                transition: transform 0.2s ease;
+                transition: transform 0.25s ease, border-color 0.25s ease;
             }
             .stat-box:hover {
-                transform: translateY(-2px);
-                border-color: rgba(59, 130, 246, 0.4);
+                transform: translateY(-3px);
+                border-color: rgba(56, 189, 248, 0.4);
             }
             .stat-box h3 { 
-                font-size: 22px; 
+                font-size: 24px; 
                 font-weight: 700;
                 color: #38bdf8; 
+                font-family: 'JetBrains Mono', monospace;
                 margin-bottom: 4px; 
             }
             .stat-box span { 
@@ -136,45 +139,41 @@ app.get('/', (req, res) => {
                 color: #64748b; 
                 text-transform: uppercase;
                 font-weight: 700;
-                letter-spacing: 0.5px;
+                letter-spacing: 0.6px;
             }
-            .powered-tag { 
+            .powered { 
                 font-size: 13px; 
-                color: #cbd5e1; 
+                color: #94a3b8; 
                 font-weight: 600;
-                padding-top: 20px;
+                padding-top: 24px;
                 border-top: 1px solid rgba(255, 255, 255, 0.06);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 6px;
             }
-            .powered-tag span {
+            .powered span {
                 color: #f59e0b;
                 font-weight: 700;
             }
         </style>
     </head>
     <body>
-        <div class="dashboard-card">
-            <div class="status-badge"><div class="pulse-dot"></div> Systems Armed 24/7</div>
+        <div class="vip-card">
+            <div class="status-pill"><div class="pulse-dot"></div> VIP Node Active 24/7</div>
             <h1>TEAM 1991</h1>
-            <p class="desc">Enterprise High-Defense Protocol, Antinuke Automation & Server Intelligence Network</p>
-            <div class="stats-container">
+            <p class="sub">Autonomous Defense Grid, Server Intelligence & High-Tier Moderation Matrix</p>
+            <div class="stats-grid">
                 <div class="stat-box">
                     <h3>${client.guilds?.cache?.size || 0}</h3>
-                    <span>Guilds</span>
+                    <span>Guilds Guarded</span>
                 </div>
                 <div class="stat-box">
                     <h3>${Math.round(client.ws?.ping) || 0}ms</h3>
-                    <span>Gateway</span>
+                    <span>Gateway Ping</span>
                 </div>
                 <div class="stat-box">
-                    <h3>${hours}h ${mins}m</h3>
+                    <h3>${days > 0 ? days + 'd ' : ''}${hours}h ${mins}m</h3>
                     <span>Active Uptime</span>
                 </div>
             </div>
-            <div class="powered-tag">Powered By <span>Arthur</span></div>
+            <div class="powered">Powered By <span>Arthur</span></div>
         </div>
     </body>
     </html>
@@ -183,17 +182,17 @@ app.get('/', (req, res) => {
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`[TEAM 1991] System operational on port ${PORT}`);
+    console.log(`[TEAM 1991] Matrix listening on port ${PORT}`);
 });
 
 client.once('ready', () => {
-    console.log(`✅ [TEAM 1991] Successfully deployed as ${client.user.tag}`);
+    console.log(`✅ [TEAM 1991] Online as ${client.user.tag}`);
 });
 
 const whitelistedUsers = new Set();
 let antinukeActive = true;
 
-// Cyber Lion Security Style Main Embed
+// Cyber Lion Security Style Main Help Embed
 function getMainCyberHelpEmbed(user) {
     return new EmbedBuilder()
         .setColor('#2b2d31')
@@ -282,7 +281,6 @@ function getCyberHelpComponents() {
     return [moduleRow, categoryRow];
 }
 
-// Sub-Embed Responses
 function getSubDetailEmbed(key) {
     const embed = new EmbedBuilder().setColor('#2b2d31').setFooter({ text: 'Powered By Arthur' });
 
@@ -298,7 +296,7 @@ function getSubDetailEmbed(key) {
         case 'mod_general':
         case 'mod_info':
             embed.setTitle('ℹ️ Information & Intel')
-                .setDescription('`Rserverinfo` (or `Rsi`), `Ruserinfo @user`, `Ravatar @user`, `Rping`, `Rbotinfo`');
+                .setDescription('`Rserverinfo` (or `Rsi`), `Ruserinfo @user` (or `Rui`), `Ravatar @user` (or `Rav`), `Rping`, `Rbotinfo` (or `Rbi`), `Rstatus`');
             break;
         case 'cat_voice':
             embed.setTitle('🎤 Voice Management')
@@ -308,19 +306,15 @@ function getSubDetailEmbed(key) {
             embed.setTitle('🔔 Welcome Configuration')
                 .setDescription('`Rwelcome #channel`, `Rwelcome test`, `Rwelcome disable`');
             break;
-        case 'cat_giveaway':
-            embed.setTitle('🎁 Giveaway Operations')
-                .setDescription('`Rgstart [time] [prize]`, `Rgend [msgID]`, `Rgreroll [msgID]`');
-            break;
         default:
             embed.setTitle(`Module: ${key.replace(/(mod_|cat_)/, '').toUpperCase()}`)
-                .setDescription(`All tactical commands ready under prefix \`R\` or \`$\`. Type \`Rhelp\` to return.`);
+                .setDescription('All tactical commands ready under prefix `R` or `$`. Type `Rhelp` to return.');
             break;
     }
     return embed;
 }
 
-// Command Handler (Prefix R, $, Mention)
+// 100% COMPLETE PERMANENT COMMAND HANDLER
 client.on('messageCreate', async (message) => {
     if (message.author.bot || !message.guild) return;
 
@@ -342,19 +336,101 @@ client.on('messageCreate', async (message) => {
     const args = content.split(/ +/);
     const command = args.shift().toLowerCase();
 
-    // 1. Help
+    // 1. HELP
     if (command === 'help') {
         const embed = getMainCyberHelpEmbed(message.author);
         const components = getCyberHelpComponents();
         return message.reply({ embeds: [embed], components: components });
     }
 
-    // 2. Ping
+    // 2. PING
     if (command === 'ping') {
         return message.reply(`🏓 Pong! Latency: **${Math.round(client.ws.ping)}ms**`);
     }
 
-    // 3. VIP Official Serverinfo / si
+    // 3. STATUS
+    if (command === 'status') {
+        const uptimeSec = Math.floor(process.uptime());
+        const hours = Math.floor(uptimeSec / 3600);
+        const mins = Math.floor((uptimeSec % 3600) / 60);
+
+        const embed = new EmbedBuilder()
+            .setColor('#38bdf8')
+            .setTitle('⚡ TEAM 1991 — Operational Status')
+            .addFields(
+                { name: '🟢 Core Status', value: '`ONLINE 24/7`', inline: true },
+                { name: '📡 Gateway Ping', value: `\`${Math.round(client.ws.ping)}ms\``, inline: true },
+                { name: '⏳ Active Uptime', value: `\`${hours}h ${mins}m\``, inline: true },
+                { name: '🛡️ Antinuke Defense', value: antinukeActive ? '`ARMED`' : '`DISARMED`', inline: true },
+                { name: '🏰 Guilds', value: `\`${client.guilds.cache.size}\``, inline: true },
+                { name: '👥 Total Users', value: `\`${client.users.cache.size}\``, inline: true }
+            )
+            .setFooter({ text: 'Powered By Arthur', iconURL: client.user.displayAvatarURL() });
+        return message.reply({ embeds: [embed] });
+    }
+
+    // 4. USERINFO / UI
+    if (command === 'userinfo' || command === 'ui') {
+        const member = message.mentions.members.first() || message.guild.members.cache.get(args[0]) || message.member;
+        const roles = member.roles.cache.filter(r => r.id !== message.guild.id).map(r => r).join(', ') || 'No Roles';
+
+        const embed = new EmbedBuilder()
+            .setColor('#38bdf8')
+            .setTitle(`👤 User Intelligence: ${member.user.tag}`)
+            .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 512 }))
+            .addFields(
+                { name: 'Username', value: `\`${member.user.username}\``, inline: true },
+                { name: 'User ID', value: `\`${member.id}\``, inline: true },
+                { name: 'Nickname', value: member.nickname ? `\`${member.nickname}\`` : 'None', inline: true },
+                { name: 'Joined Server', value: `<t:${Math.floor(member.joinedTimestamp / 1000)}:R>`, inline: true },
+                { name: 'Account Created', value: `<t:${Math.floor(member.user.createdTimestamp / 1000)}:R>`, inline: true },
+                { name: 'Bot Account', value: member.user.bot ? '`Yes`' : '`No`', inline: true },
+                { name: `Roles [${member.roles.cache.size - 1}]`, value: roles.length > 1024 ? `${roles.substring(0, 1020)}...` : roles, inline: false }
+            )
+            .setFooter({ text: 'Powered By Arthur', iconURL: client.user.displayAvatarURL() });
+        return message.reply({ embeds: [embed] });
+    }
+
+    // 5. AVATAR / AV
+    if (command === 'avatar' || command === 'av') {
+        const target = message.mentions.users.first() || client.users.cache.get(args[0]) || message.author;
+        const avatarURL = target.displayAvatarURL({ dynamic: true, size: 2048 });
+
+        const embed = new EmbedBuilder()
+            .setColor('#38bdf8')
+            .setTitle(`🖼️ Avatar for ${target.tag}`)
+            .setImage(avatarURL)
+            .setDescription(`[Direct Image Link](${avatarURL})`)
+            .setFooter({ text: 'Powered By Arthur', iconURL: client.user.displayAvatarURL() });
+        return message.reply({ embeds: [embed] });
+    }
+
+    // 6. BOTINFO / BI
+    if (command === 'botinfo' || command === 'bi') {
+        const uptimeSec = Math.floor(process.uptime());
+        const hours = Math.floor(uptimeSec / 3600);
+        const mins = Math.floor((uptimeSec % 3600) / 60);
+
+        const embed = new EmbedBuilder()
+            .setColor('#f59e0b')
+            .setTitle('🤖 TEAM 1991 — Bot Intelligence')
+            .setThumbnail(client.user.displayAvatarURL({ dynamic: true }))
+            .addFields(
+                { name: 'Bot Tag', value: `\`${client.user.tag}\``, inline: true },
+                { name: 'Bot ID', value: `\`${client.user.id}\``, inline: true },
+                { name: 'Prefix', value: '`R` / `$`', inline: true },
+                { name: 'Developers', value: '**Arthur**', inline: true },
+                { name: 'Servers', value: `\`${client.guilds.cache.size}\``, inline: true },
+                { name: 'Node.js', value: `\`${process.version}\``, inline: true },
+                { name: 'Discord.js', value: '`v14.18.0`', inline: true },
+                { name: 'Active Uptime', value: `\`${hours}h ${mins}m\``, inline: true },
+                { name: 'Ping', value: `\`${Math.round(client.ws.ping)}ms\``, inline: true }
+            )
+            .setFooter({ text: 'Powered By Arthur', iconURL: client.user.displayAvatarURL() });
+        return message.reply({ embeds: [embed] });
+    }
+
+    // 7. VIP SERVERINFO / SI
     if (command === 'serverinfo' || command === 'si') {
         const guild = message.guild;
         const owner = await guild.fetchOwner().catch(() => null);
@@ -362,7 +438,7 @@ client.on('messageCreate', async (message) => {
         const textCount = guild.channels.cache.filter(c => c.type === ChannelType.GuildText).size;
         const voiceCount = guild.channels.cache.filter(c => c.type === ChannelType.GuildVoice).size;
         const totalMembers = guild.memberCount;
-        const totalRoles = guild.roles.cache.size - 1; // excluding @everyone
+        const totalRoles = guild.roles.cache.size - 1;
 
         const vipEmbed = new EmbedBuilder()
             .setColor('#f59e0b')
@@ -400,7 +476,12 @@ client.on('messageCreate', async (message) => {
         return message.reply({ embeds: [vipEmbed] });
     }
 
-    // 4. Antinuke Setup
+    // 8. MEMBERCOUNT / MC
+    if (command === 'membercount' || command === 'mc') {
+        return message.reply(`👥 **${message.guild.name}** has total **${message.guild.memberCount}** members.`);
+    }
+
+    // 9. ANTINUKE
     if (command === 'antinuke') {
         if (message.author.id !== message.guild.ownerId) {
             return message.reply('❌ Only the Server Owner can configure Antinuke parameters!');
@@ -417,7 +498,7 @@ client.on('messageCreate', async (message) => {
         }
     }
 
-    // 5. Whitelist
+    // 10. WHITELIST
     if (command === 'whitelist') {
         if (message.author.id !== message.guild.ownerId) {
             return message.reply('❌ Only the Server Owner can grant whitelist clearances!');
@@ -444,7 +525,7 @@ client.on('messageCreate', async (message) => {
         return message.reply(`🔒 **Whitelisted Members:** ${list}`);
     }
 
-    // 6. Clear / Purge
+    // 11. CLEAR / PURGE
     if (command === 'clear' || command === 'purge') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
             return message.reply('❌ Manage Messages permission required!');
@@ -457,7 +538,7 @@ client.on('messageCreate', async (message) => {
         return message.channel.send(`🧹 Cleared **${amount}** messages!`).then(m => setTimeout(() => m.delete(), 3000));
     }
 
-    // 7. Ban
+    // 12. BAN
     if (command === 'ban') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.BanMembers)) {
             return message.reply('❌ Ban Members permission required!');
@@ -469,7 +550,7 @@ client.on('messageCreate', async (message) => {
         return message.reply(`🔨 Successfully banned **${member.user.tag}**.`);
     }
 
-    // 8. Kick
+    // 13. KICK
     if (command === 'kick') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.KickMembers)) {
             return message.reply('❌ Kick Members permission required!');
@@ -481,7 +562,7 @@ client.on('messageCreate', async (message) => {
         return message.reply(`👢 Successfully kicked **${member.user.tag}**.`);
     }
 
-    // 9. Mute / Timeout
+    // 14. MUTE / TIMEOUT
     if (command === 'mute' || command === 'timeout') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
             return message.reply('❌ Moderate Members permission required!');
@@ -493,6 +574,7 @@ client.on('messageCreate', async (message) => {
         return message.reply(`🔇 Applied a **${mins}** minute timeout to **${member.user.tag}**.`);
     }
 
+    // 15. UNMUTE
     if (command === 'unmute') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
             return message.reply('❌ Moderate Members permission required!');
@@ -503,7 +585,7 @@ client.on('messageCreate', async (message) => {
         return message.reply(`🔊 Removed timeout from **${member.user.tag}**.`);
     }
 
-    // 10. Lock & Unlock
+    // 16. LOCK & UNLOCK
     if (command === 'lock') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.ManageChannels)) {
             return message.reply('❌ Manage Channels permission required!');
@@ -520,7 +602,7 @@ client.on('messageCreate', async (message) => {
         return message.reply('🔓 Channel communications unlocked.');
     }
 
-    // 11. Voice Commands
+    // 17. VOICE COMMANDS
     if (command === 'vckick') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.MoveMembers)) {
             return message.reply('❌ Move Members permission required!');
