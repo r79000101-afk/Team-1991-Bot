@@ -4,7 +4,8 @@ const {
     EmbedBuilder, 
     ActionRowBuilder, 
     StringSelectMenuBuilder, 
-    PermissionsBitField 
+    PermissionsBitField,
+    ChannelType
 } = require('discord.js');
 const express = require('express');
 
@@ -20,7 +21,7 @@ const client = new Client({
     ]
 });
 
-// Clean Cyber Dashboard
+// VIP Ultra-Modern Futuristic Dashboard
 app.get('/', (req, res) => {
     const uptimeSec = Math.floor(process.uptime());
     const hours = Math.floor(uptimeSec / 3600);
@@ -32,42 +33,148 @@ app.get('/', (req, res) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>TEAM 1991 Control Center</title>
+        <title>TEAM 1991 || Official Control Matrix</title>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
         <style>
             * { box-sizing: border-box; margin: 0; padding: 0; }
-            body { font-family: 'Segoe UI', Roboto, sans-serif; background: #080a10; color: #ffffff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-            .card { background: #10141f; border: 1px solid #1f273b; border-radius: 16px; max-width: 540px; width: 100%; padding: 36px 28px; text-align: center; box-shadow: 0 12px 35px rgba(0,0,0,0.7); }
-            .badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #22c55e; padding: 6px 14px; border-radius: 50px; font-size: 13px; font-weight: 600; margin-bottom: 20px; }
-            .dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 10px #22c55e; }
-            h1 { font-size: 26px; color: #ff9900; margin-bottom: 8px; font-weight: 700; }
-            p.sub { font-size: 14px; color: #94a3b8; margin-bottom: 24px; }
-            .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; border-top: 1px solid #1f273b; padding-top: 22px; }
-            .stat-box { background: #0a0d14; padding: 14px 10px; border-radius: 10px; border: 1px solid #182030; }
-            .stat-box h3 { font-size: 18px; color: #38bdf8; margin-bottom: 4px; }
-            .stat-box span { font-size: 12px; color: #64748b; }
-            .footer-txt { margin-top: 24px; font-size: 12px; color: #475569; }
+            body { 
+                font-family: 'Plus Jakarta Sans', sans-serif; 
+                background: #030712; 
+                background-image: 
+                    radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.18) 0px, transparent 50%),
+                    radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.15) 0px, transparent 50%);
+                color: #f8fafc; 
+                display: flex; 
+                justify-content: center; 
+                align-items: center; 
+                min-height: 100vh; 
+                padding: 24px; 
+            }
+            .dashboard-card { 
+                background: rgba(15, 23, 42, 0.75); 
+                backdrop-filter: blur(20px); 
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.08); 
+                border-radius: 24px; 
+                max-width: 580px; 
+                width: 100%; 
+                padding: 44px 32px; 
+                text-align: center; 
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 40px rgba(59, 130, 246, 0.12);
+                position: relative;
+                overflow: hidden;
+            }
+            .dashboard-card::before {
+                content: '';
+                position: absolute;
+                top: 0; left: 0; right: 0;
+                height: 3px;
+                background: linear-gradient(90deg, #3b82f6, #f59e0b, #ef4444);
+            }
+            .status-badge { 
+                display: inline-flex; 
+                align-items: center; 
+                gap: 8px; 
+                background: rgba(34, 197, 94, 0.12); 
+                border: 1px solid rgba(34, 197, 94, 0.35); 
+                color: #4ade80; 
+                padding: 6px 18px; 
+                border-radius: 9999px; 
+                font-size: 13px; 
+                font-weight: 700; 
+                letter-spacing: 0.8px;
+                text-transform: uppercase;
+                margin-bottom: 24px; 
+            }
+            .pulse-dot { 
+                width: 8px; 
+                height: 8px; 
+                background: #4ade80; 
+                border-radius: 50%; 
+                box-shadow: 0 0 12px #4ade80; 
+            }
+            h1 { 
+                font-size: 32px; 
+                font-weight: 800; 
+                letter-spacing: -0.5px;
+                background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                margin-bottom: 10px; 
+            }
+            p.desc { 
+                font-size: 14px; 
+                color: #94a3b8; 
+                margin-bottom: 32px; 
+                line-height: 1.6;
+            }
+            .stats-container { 
+                display: grid; 
+                grid-template-columns: repeat(3, 1fr); 
+                gap: 16px; 
+                margin-bottom: 30px;
+            }
+            .stat-box { 
+                background: rgba(30, 41, 59, 0.5); 
+                padding: 18px 12px; 
+                border-radius: 16px; 
+                border: 1px solid rgba(255, 255, 255, 0.05); 
+                transition: transform 0.2s ease;
+            }
+            .stat-box:hover {
+                transform: translateY(-2px);
+                border-color: rgba(59, 130, 246, 0.4);
+            }
+            .stat-box h3 { 
+                font-size: 22px; 
+                font-weight: 700;
+                color: #38bdf8; 
+                margin-bottom: 4px; 
+            }
+            .stat-box span { 
+                font-size: 11px; 
+                color: #64748b; 
+                text-transform: uppercase;
+                font-weight: 700;
+                letter-spacing: 0.5px;
+            }
+            .powered-tag { 
+                font-size: 13px; 
+                color: #cbd5e1; 
+                font-weight: 600;
+                padding-top: 20px;
+                border-top: 1px solid rgba(255, 255, 255, 0.06);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+            }
+            .powered-tag span {
+                color: #f59e0b;
+                font-weight: 700;
+            }
         </style>
     </head>
     <body>
-        <div class="card">
-            <div class="badge"><div class="dot"></div> Security Core Active 24/7</div>
+        <div class="dashboard-card">
+            <div class="status-badge"><div class="pulse-dot"></div> Systems Armed 24/7</div>
             <h1>TEAM 1991</h1>
-            <p class="sub">Autonomous Moderation, Protection & Server Management</p>
-            <div class="stats">
+            <p class="desc">Enterprise High-Defense Protocol, Antinuke Automation & Server Intelligence Network</p>
+            <div class="stats-container">
                 <div class="stat-box">
                     <h3>${client.guilds?.cache?.size || 0}</h3>
-                    <span>Servers</span>
+                    <span>Guilds</span>
                 </div>
                 <div class="stat-box">
                     <h3>${Math.round(client.ws?.ping) || 0}ms</h3>
-                    <span>Latency</span>
+                    <span>Gateway</span>
                 </div>
                 <div class="stat-box">
                     <h3>${hours}h ${mins}m</h3>
-                    <span>Uptime</span>
+                    <span>Active Uptime</span>
                 </div>
             </div>
-            <p class="footer-txt">Powered By AeroX Devs</p>
+            <div class="powered-tag">Powered By <span>Arthur</span></div>
         </div>
     </body>
     </html>
@@ -76,17 +183,17 @@ app.get('/', (req, res) => {
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Web Server running on port ${PORT}`);
+    console.log(`[TEAM 1991] System operational on port ${PORT}`);
 });
 
 client.once('ready', () => {
-    console.log(`✅ Logged in as ${client.user.tag}!`);
+    console.log(`✅ [TEAM 1991] Successfully deployed as ${client.user.tag}`);
 });
 
 const whitelistedUsers = new Set();
 let antinukeActive = true;
 
-// Screenshot-matched Layout[span_6](start_span)[span_6](end_span)
+// Cyber Lion Security Style Main Embed
 function getMainCyberHelpEmbed(user) {
     return new EmbedBuilder()
         .setColor('#2b2d31')
@@ -125,12 +232,11 @@ function getMainCyberHelpEmbed(user) {
 ⚙️ » Reaction Roles
 \`\`\`
         `)
-        .setFooter({ text: 'Powered By AeroX Devs' });
+        .setFooter({ text: 'Powered By Arthur' });
 }
 
-// Dual Dropdown Components matching Screenshots[span_7](start_span)[span_7](end_span)[span_8](start_span)[span_8](end_span)
+// Dual Dropdown Components
 function getCyberHelpComponents() {
-    // Menu 1: Module Selector[span_9](start_span)[span_9](end_span)[span_10](start_span)[span_10](end_span)
     const moduleRow = new ActionRowBuilder().addComponents(
         new StringSelectMenuBuilder()
             .setCustomId('select_module_menu')
@@ -152,7 +258,6 @@ function getCyberHelpComponents() {
             ])
     );
 
-    // Menu 2: Category Selector[span_11](start_span)[span_11](end_span)
     const categoryRow = new ActionRowBuilder().addComponents(
         new StringSelectMenuBuilder()
             .setCustomId('select_category_menu')
@@ -179,43 +284,43 @@ function getCyberHelpComponents() {
 
 // Sub-Embed Responses
 function getSubDetailEmbed(key) {
-    const embed = new EmbedBuilder().setColor('#2b2d31').setFooter({ text: 'Powered By AeroX Devs' });
+    const embed = new EmbedBuilder().setColor('#2b2d31').setFooter({ text: 'Powered By Arthur' });
 
     switch (key) {
         case 'mod_moderation':
-            embed.setTitle('🔨 Moderation Module')
+            embed.setTitle('🔨 Moderation Suite')
                 .setDescription('`Rban @user [reason]`, `Rkick @user`, `Rmute @user [time]`, `Runmute @user`, `Rclear [amount]`, `Rlock`, `Runlock`');
             break;
         case 'mod_antinuke':
-            embed.setTitle('⚔️ Antinuke Defense Module')
+            embed.setTitle('⚔️ Antinuke Defense Protocol')
                 .setDescription('`Rantinuke enable/disable`, `Rwhitelist @user`, `Runwhitelist @user`, `Rwhitelisted`');
             break;
         case 'mod_general':
         case 'mod_info':
-            embed.setTitle('ℹ️ Information & General')
+            embed.setTitle('ℹ️ Information & Intel')
                 .setDescription('`Rserverinfo` (or `Rsi`), `Ruserinfo @user`, `Ravatar @user`, `Rping`, `Rbotinfo`');
             break;
         case 'cat_voice':
-            embed.setTitle('🎤 Voice Control')
+            embed.setTitle('🎤 Voice Management')
                 .setDescription('`Rvckick @user`, `Rvcmute @user`, `Rvcunmute @user`');
             break;
         case 'mod_welcome':
-            embed.setTitle('🔔 Welcome Setup')
+            embed.setTitle('🔔 Welcome Configuration')
                 .setDescription('`Rwelcome #channel`, `Rwelcome test`, `Rwelcome disable`');
             break;
         case 'cat_giveaway':
-            embed.setTitle('🎁 Giveaway Commands')
+            embed.setTitle('🎁 Giveaway Operations')
                 .setDescription('`Rgstart [time] [prize]`, `Rgend [msgID]`, `Rgreroll [msgID]`');
             break;
         default:
             embed.setTitle(`Module: ${key.replace(/(mod_|cat_)/, '').toUpperCase()}`)
-                .setDescription('All sub-commands are active under prefix `R` or `$`. Type `Rhelp` to return.');
+                .setDescription(`All tactical commands ready under prefix \`R\` or \`$\`. Type \`Rhelp\` to return.`);
             break;
     }
     return embed;
 }
 
-// Command Handler (Prefix 'R', '$', or Bot Mention)[span_12](start_span)[span_12](end_span)
+// Command Handler (Prefix R, $, Mention)
 client.on('messageCreate', async (message) => {
     if (message.author.bot || !message.guild) return;
 
@@ -237,7 +342,7 @@ client.on('messageCreate', async (message) => {
     const args = content.split(/ +/);
     const command = args.shift().toLowerCase();
 
-    // 1. Help Command
+    // 1. Help
     if (command === 'help') {
         const embed = getMainCyberHelpEmbed(message.author);
         const components = getCyberHelpComponents();
@@ -249,28 +354,56 @@ client.on('messageCreate', async (message) => {
         return message.reply(`🏓 Pong! Latency: **${Math.round(client.ws.ping)}ms**`);
     }
 
-    // 3. Serverinfo / si
+    // 3. VIP Official Serverinfo / si
     if (command === 'serverinfo' || command === 'si') {
         const guild = message.guild;
-        const embed = new EmbedBuilder()
-            .setColor('#2b2d31')
-            .setTitle(`📊 Server Intelligence: ${guild.name}`)
-            .setThumbnail(guild.iconURL({ dynamic: true }))
+        const owner = await guild.fetchOwner().catch(() => null);
+
+        const textCount = guild.channels.cache.filter(c => c.type === ChannelType.GuildText).size;
+        const voiceCount = guild.channels.cache.filter(c => c.type === ChannelType.GuildVoice).size;
+        const totalMembers = guild.memberCount;
+        const totalRoles = guild.roles.cache.size - 1; // excluding @everyone
+
+        const vipEmbed = new EmbedBuilder()
+            .setColor('#f59e0b')
+            .setTitle(`👑 OFFICIAL SERVER INTELLIGENCE: ${guild.name.toUpperCase()}`)
+            .setThumbnail(guild.iconURL({ dynamic: true, size: 1024 }))
+            .setDescription(`
+> **Team 1991 VIP Security Protocol Active**
+> High-tier defense matrix protecting guild infrastructure.
+            `)
             .addFields(
-                { name: 'Owner', value: `<@${guild.ownerId}>`, inline: true },
-                { name: 'Total Members', value: `${guild.memberCount}`, inline: true },
-                { name: 'Roles', value: `${guild.roles.cache.size}`, inline: true },
-                { name: 'Channels', value: `${guild.channels.cache.size}`, inline: true },
-                { name: 'Created', value: `<t:${Math.floor(guild.createdTimestamp / 1000)}:R>`, inline: true }
+                {
+                    name: '📌 Core Identity',
+                    value: `**Server Name:** \`${guild.name}\`\n**Server ID:** \`${guild.id}\`\n**Crown / Owner:** <@${guild.ownerId}> (\`${owner?.user?.tag || guild.ownerId}\`)`,
+                    inline: false
+                },
+                {
+                    name: '👥 Personnel Analytics',
+                    value: `**Total Members:** \`${totalMembers}\`\n**Roles Hierarchy:** \`${totalRoles}\` Roles\n**Verification Tier:** \`${guild.verificationLevel}\``,
+                    inline: true
+                },
+                {
+                    name: '📡 Channel Spectrum',
+                    value: `**Total Channels:** \`${guild.channels.cache.size}\`\n💬 **Text:** \`${textCount}\` | 🔊 **Voice:** \`${voiceCount}\`\n💎 **Boost Level:** \`Tier ${guild.premiumTier}\` (\`${guild.premiumSubscriptionCount || 0} Boosts\`)`,
+                    inline: true
+                },
+                {
+                    name: '⏳ Establishment Timeline',
+                    value: `**Created On:** <t:${Math.floor(guild.createdTimestamp / 1000)}:F>\n**Elapsed Age:** <t:${Math.floor(guild.createdTimestamp / 1000)}:R>`,
+                    inline: false
+                }
             )
-            .setFooter({ text: 'Powered By AeroX Devs' });
-        return message.reply({ embeds: [embed] });
+            .setFooter({ text: 'Powered By Arthur', iconURL: client.user.displayAvatarURL() })
+            .setTimestamp();
+
+        return message.reply({ embeds: [vipEmbed] });
     }
 
-    // 4. Antinuke Commands
+    // 4. Antinuke Setup
     if (command === 'antinuke') {
         if (message.author.id !== message.guild.ownerId) {
-            return message.reply('❌ Only the Server Owner can configure Antinuke settings!');
+            return message.reply('❌ Only the Server Owner can configure Antinuke parameters!');
         }
         const action = args[0]?.toLowerCase();
         if (action === 'enable' || action === 'on') {
@@ -287,7 +420,7 @@ client.on('messageCreate', async (message) => {
     // 5. Whitelist
     if (command === 'whitelist') {
         if (message.author.id !== message.guild.ownerId) {
-            return message.reply('❌ Only the Server Owner can add users to the whitelist!');
+            return message.reply('❌ Only the Server Owner can grant whitelist clearances!');
         }
         const target = message.mentions.members.first();
         if (!target) return message.reply('❌ Mention a member: `Rwhitelist @user`');
@@ -297,7 +430,7 @@ client.on('messageCreate', async (message) => {
 
     if (command === 'unwhitelist') {
         if (message.author.id !== message.guild.ownerId) {
-            return message.reply('❌ Only the Server Owner can remove users from the whitelist!');
+            return message.reply('❌ Only the Server Owner can revoke whitelist clearances!');
         }
         const target = message.mentions.members.first();
         if (!target) return message.reply('❌ Mention a member: `Runwhitelist @user`');
@@ -332,7 +465,7 @@ client.on('messageCreate', async (message) => {
         const member = message.mentions.members.first();
         if (!member) return message.reply('❌ Mention a member: `Rban @user [reason]`');
         if (!member.bannable) return message.reply('❌ Cannot ban this user (Check role hierarchy).');
-        await member.ban({ reason: args.slice(1).join(' ') || 'No reason' });
+        await member.ban({ reason: args.slice(1).join(' ') || 'No reason specified' });
         return message.reply(`🔨 Successfully banned **${member.user.tag}**.`);
     }
 
@@ -356,13 +489,13 @@ client.on('messageCreate', async (message) => {
         const member = message.mentions.members.first();
         const mins = parseInt(args[1]) || 5;
         if (!member) return message.reply('❌ Mention a member: `Rmute @user 10`');
-        await member.timeout(mins * 60 * 1000, 'TEAM 1991 Moderation');
-        return message.reply(`🔇 Muted **${member.user.tag}** for **${mins}** minutes.`);
+        await member.timeout(mins * 60 * 1000, 'TEAM 1991 Enforcement');
+        return message.reply(`🔇 Applied a **${mins}** minute timeout to **${member.user.tag}**.`);
     }
 
     if (command === 'unmute') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
-            return message.reply('❌ Permission required!');
+            return message.reply('❌ Moderate Members permission required!');
         }
         const member = message.mentions.members.first();
         if (!member) return message.reply('❌ Mention a member: `Runmute @user`');
@@ -376,7 +509,7 @@ client.on('messageCreate', async (message) => {
             return message.reply('❌ Manage Channels permission required!');
         }
         await message.channel.permissionOverwrites.edit(message.guild.roles.everyone, { SendMessages: false });
-        return message.reply('🔒 Channel locked.');
+        return message.reply('🔒 Channel communications locked.');
     }
 
     if (command === 'unlock') {
@@ -384,7 +517,7 @@ client.on('messageCreate', async (message) => {
             return message.reply('❌ Manage Channels permission required!');
         }
         await message.channel.permissionOverwrites.edit(message.guild.roles.everyone, { SendMessages: true });
-        return message.reply('🔓 Channel unlocked.');
+        return message.reply('🔓 Channel communications unlocked.');
     }
 
     // 11. Voice Commands
@@ -393,7 +526,7 @@ client.on('messageCreate', async (message) => {
             return message.reply('❌ Move Members permission required!');
         }
         const member = message.mentions.members.first();
-        if (!member || !member.voice.channel) return message.reply('❌ User must be in a voice channel.');
+        if (!member || !member.voice.channel) return message.reply('❌ User must be inside a voice channel.');
         await member.voice.disconnect();
         return message.reply(`🔌 Disconnected **${member.user.tag}** from voice.`);
     }
@@ -403,9 +536,9 @@ client.on('messageCreate', async (message) => {
             return message.reply('❌ Mute Members permission required!');
         }
         const member = message.mentions.members.first();
-        if (!member || !member.voice.channel) return message.reply('❌ User must be in a voice channel.');
+        if (!member || !member.voice.channel) return message.reply('❌ User must be inside a voice channel.');
         await member.voice.setMute(true);
-        return message.reply(`🔇 Voice-muted **${member.user.tag}**.`);
+        return message.reply(`🔇 Server-muted **${member.user.tag}** in voice.`);
     }
 
     if (command === 'vcunmute') {
@@ -413,13 +546,13 @@ client.on('messageCreate', async (message) => {
             return message.reply('❌ Mute Members permission required!');
         }
         const member = message.mentions.members.first();
-        if (!member || !member.voice.channel) return message.reply('❌ User must be in a voice channel.');
+        if (!member || !member.voice.channel) return message.reply('❌ User must be inside a voice channel.');
         await member.voice.setMute(false);
-        return message.reply(`🔊 Voice-unmuted **${member.user.tag}**.`);
+        return message.reply(`🔊 Restored voice audio for **${member.user.tag}**.`);
     }
 });
 
-// Dropdown Interactions[span_13](start_span)[span_13](end_span)[span_14](start_span)[span_14](end_span)
+// Dropdown Menus Interaction Handler
 client.on('interactionCreate', async (interaction) => {
     if (!interaction.isStringSelectMenu()) return;
 
