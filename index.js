@@ -21,7 +21,7 @@ const client = new Client({
     ]
 });
 
-// VIP Ultra-Dark Luxury Dashboard
+// VIP Ultra-Luxury Cyberpunk Dashboard
 app.get('/', (req, res) => {
     const uptimeSec = Math.floor(process.uptime());
     const days = Math.floor(uptimeSec / 86400);
@@ -179,7 +179,7 @@ client.once('ready', () => {
     console.log(`✅ [TEAM 1991] Online as ${client.user.tag}`);
 });
 
-const BLACK_COLOR = '#000001'; // Discord Pure Black AMOLED Embed
+const BLACK_COLOR = '#0b0b0b';
 const PREFIX = 'R';
 
 const whitelistedUsers = new Set();
@@ -187,11 +187,11 @@ let antinukeActive = true;
 let automodActive = true;
 const afkUsers = new Map();
 
-// High Quality Roleplay & Funny Meme GIF Database
+// High Quality Direct GIF database
 const roleplayGifs = {
     hug: [
+        'https://cdn.discordapp.com/attachments/1089204044154671155/1105151528437698570/hug.gif',
         'https://media.giphy.com/media/u9BxQbM5bxvwA/giphy.gif',
-        'https://media.giphy.com/media/lrr9rHuoJOE0w/giphy.gif',
         'https://media.giphy.com/media/od5H3PmEG5EVq/giphy.gif'
     ],
     kiss: [
@@ -219,7 +219,7 @@ const roleplayGifs = {
     ]
 };
 
-// Main Cyber Help Embed
+// Main Cyber Help Embed - STRICTLY ONLY 'R' PREFIX
 function getMainCyberHelpEmbed(user) {
     return new EmbedBuilder()
         .setColor(BLACK_COLOR)
@@ -261,7 +261,7 @@ function getMainCyberHelpEmbed(user) {
         .setFooter({ text: 'Powered By Arthur' });
 }
 
-// Dual Dropdowns
+// Dual Dropdown Components
 function getCyberHelpComponents() {
     const moduleRow = new ActionRowBuilder().addComponents(
         new StringSelectMenuBuilder()
@@ -314,15 +314,11 @@ function getSubDetailEmbed(key) {
     switch (key) {
         case 'mod_moderation':
             embed.setTitle('🔨 Moderation Suite')
-                .setDescription('`Rban @user`, `Rkick @user`, `Rmute @user [time]`, `Runmute @user`, `Rclear [amount]`, `Rlock`, `Runlock`, `Rroleicon @role <url>`');
+                .setDescription('`Rban @user`, `Rkick @user`, `Rmute @user [time]`, `Runmute @user`, `Rclear [amount]`, `Rlock`, `Runlock`, `Rroleicon @role <url>`, `Rcreaterole <name>`, `Raddrole @user @role`');
             break;
         case 'mod_antinuke':
             embed.setTitle('⚔️ Antinuke Defense Protocol')
                 .setDescription('`Rantinuke enable/disable`, `Rwhitelist @user`, `Runwhitelist @user`, `Rwhitelisted`');
-            break;
-        case 'mod_automod':
-            embed.setTitle('🛠️ AutoMod System')
-                .setDescription('`Rautomod on`, `Rautomod off`');
             break;
         case 'mod_roleplay':
             embed.setTitle('🤍 Roleplay Actions')
@@ -330,7 +326,7 @@ function getSubDetailEmbed(key) {
             break;
         case 'mod_fun':
             embed.setTitle('🎮 Fun Commands')
-                .setDescription('`Rmeme` (Funny Meme Image), `Rcoinflip`, `Rroll`');
+                .setDescription('`Rmeme`, `Rcoinflip`, `Rroll`');
             break;
         case 'mod_general':
         case 'mod_info':
@@ -345,7 +341,7 @@ function getSubDetailEmbed(key) {
     return embed;
 }
 
-// PERMANENT COMMAND HANDLER (ONLY PREFIX 'R')
+// PERMANENT COMMAND HANDLER (STRICTLY PREFIX 'R')
 client.on('messageCreate', async (message) => {
     if (message.author.bot || !message.guild) return;
 
@@ -370,18 +366,17 @@ client.on('messageCreate', async (message) => {
 
     let content = message.content.trim();
 
-    // STRICTLY ONLY PREFIX 'R' OR BOT MENTION
+    // STRICTLY ONLY 'R' OR BOT MENTION
     const mentionRegex = new RegExp(`^<@!?${client.user.id}>(?:\\s+)?`);
     let prefixUsed = null;
 
     if (mentionRegex.test(content)) {
         prefixUsed = content.match(mentionRegex)[0];
-    } else if (content.startsWith(PREFIX)) {
-        prefixUsed = PREFIX;
-    } else if (content.startsWith(PREFIX.toLowerCase())) {
-        prefixUsed = PREFIX.toLowerCase();
+    } else if (content.startsWith('R') || content.startsWith('r')) {
+        prefixUsed = content[0];
     }
 
+    // $ OR OTHER PREFIXES COMPLETELY IGNORED
     if (!prefixUsed) return;
 
     content = content.slice(prefixUsed.length).trim();
@@ -393,7 +388,7 @@ client.on('messageCreate', async (message) => {
         return message.reply({ embeds: [getMainCyberHelpEmbed(message.author)], components: getCyberHelpComponents() });
     }
 
-    // 2. VIP PING / LATENCY (Exact Xieron VIP Look in Pure Black)[span_16](start_span)[span_16](end_span)
+    // 2. VIP PING / LATENCY
     if (command === 'ping') {
         const wsPing = client.ws.ping;
         const pingEmbed = new EmbedBuilder()
@@ -445,37 +440,115 @@ Redis DEL: 0ms
         return message.reply({ embeds: [vipEmbed] });
     }
 
-    // 4. ROLE ICON COMMAND (Add/Set icon to any role)
+    // 4. ROLEPLAY ACTIONS WITH ANIME GIFS & PICS (Fixed)
+    if (['hug', 'kiss', 'slap', 'punch', 'pat'].includes(command)) {
+        const target = message.mentions.users.first();
+        if (!target) return message.reply(`❌ Mention someone: \`R${command} @user\``);
+
+        const gifs = roleplayGifs[command];
+        const randomGif = gifs[Math.floor(Math.random() * gifs.length)];
+        
+        const actions = {
+            hug: `warmly hugged`,
+            kiss: `kissed`,
+            slap: `slapped`,
+            punch: `punched`,
+            pat: `gently patted`
+        };
+
+        const embed = new EmbedBuilder()
+            .setColor(BLACK_COLOR)
+            .setDescription(`🎭 **${message.author.username}** ${actions[command]} **${target.username}**!`)
+            .setImage(randomGif)
+            .setFooter({ text: 'Powered By Arthur' });
+
+        return message.reply({ embeds: [embed] });
+    }
+
+    // 5. FUNNY MEME IMAGE GENERATOR
+    if (command === 'meme') {
+        const randomMeme = roleplayGifs.meme[Math.floor(Math.random() * roleplayGifs.meme.length)];
+        const memeEmbed = new EmbedBuilder()
+            .setColor(BLACK_COLOR)
+            .setTitle('😂 Random Funny Meme')
+            .setImage(randomMeme)
+            .setFooter({ text: 'Powered By Arthur' });
+        return message.reply({ embeds: [memeEmbed] });
+    }
+
+    // 6. CREATE PREMIUM ROLE WITH ICON
+    if (command === 'createrole') {
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageRoles)) {
+            return message.reply('❌ Manage Roles permission required!');
+        }
+        const roleName = args.join(' ') || 'VIP Member';
+        try {
+            const role = await message.guild.roles.create({
+                name: `⭐ ${roleName}`,
+                color: '#f59e0b',
+                permissions: [],
+                reason: 'Team 1991 VIP Role Creation'
+            });
+
+            const embed = new EmbedBuilder()
+                .setColor(BLACK_COLOR)
+                .setTitle('👑 Premium Role Created')
+                .setDescription(`Successfully created role: ${role}\nRole ID: \`${role.id}\``)
+                .setFooter({ text: 'Powered By Arthur' });
+            return message.reply({ embeds: [embed] });
+        } catch (e) {
+            return message.reply('❌ Error creating role. Check role permissions hierarchy.');
+        }
+    }
+
+    // 7. ASSIGN ROLE (Add Role)
+    if (command === 'addrole') {
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageRoles)) {
+            return message.reply('❌ Manage Roles permission required!');
+        }
+        const member = message.mentions.members.first();
+        const role = message.mentions.roles.first() || message.guild.roles.cache.get(args[1]);
+        if (!member || !role) return message.reply('❌ Usage: `Raddrole @user @role`');
+
+        await member.roles.add(role);
+        const embed = new EmbedBuilder()
+            .setColor(BLACK_COLOR)
+            .setDescription(`✅ Successfully added ${role} to **${member.user.tag}**!`)
+            .setFooter({ text: 'Powered By Arthur' });
+        return message.reply({ embeds: [embed] });
+    }
+
+    // 8. ROLE ICON COMMAND
     if (command === 'roleicon') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.ManageRoles)) {
             return message.reply('❌ Manage Roles permission required!');
         }
         const role = message.mentions.roles.first() || message.guild.roles.cache.get(args[0]);
         const iconURL = args[1];
-        if (!role) return message.reply(`❌ Mention a role: \`${PREFIX}roleicon @role <image_url>\``);
-        if (!iconURL) return message.reply(`❌ Provide image link: \`${PREFIX}roleicon @role https://link.com/icon.png\``);
+        if (!role) return message.reply('❌ Mention a role: `Rroleicon @role <image_url>`');
+        if (!iconURL) return message.reply('❌ Provide image link: `Rroleicon @role https://link.com/icon.png`');
 
         try {
             await role.setIcon(iconURL);
             const embed = new EmbedBuilder()
                 .setColor(BLACK_COLOR)
                 .setTitle('✨ Role Icon Updated')
-                .setDescription(`Successfully set new role icon for ${role}!`)
+                .setDescription(`Successfully updated role icon for ${role}!`)
                 .setThumbnail(iconURL)
                 .setFooter({ text: 'Powered By Arthur' });
             return message.reply({ embeds: [embed] });
         } catch (e) {
-            return message.reply('❌ Could not set icon. Make sure the server is Level 2 Boosted and the bot has Manage Roles permission above that role!');
+            return message.reply('❌ Could not set icon. Make sure the server has Level 2 Boost!');
         }
     }
 
-    // 5. ROLEINFO (Shows icon and details of role)
+    // 9. ROLEINFO
     if (command === 'roleinfo') {
         const role = message.mentions.roles.first() || message.guild.roles.cache.get(args[0]);
-        if (!role) return message.reply(`Mention a role: \`${PREFIX}roleinfo @role\``);
+        if (!role) return message.reply('Mention a role: `Rroleinfo @role`');
         
         const embed = new EmbedBuilder()
-            .setColor(role.hexColor !== '#000000' ? role.hexColor : BLACK_COLOR)
+            .setColor(BLACK_COLOR)
             .setTitle(`🏷️ Role Information: ${role.name}`)
             .addFields(
                 { name: 'Role ID', value: `\`${role.id}\``, inline: true },
@@ -489,42 +562,7 @@ Redis DEL: 0ms
         return message.reply({ embeds: [embed] });
     }
 
-    // 6. FUNNY ROLEPLAY COMMANDS WITH GIFS
-    if (['hug', 'kiss', 'slap', 'punch', 'pat'].includes(command)) {
-        const target = message.mentions.users.first();
-        if (!target) return message.reply(`❌ Mention someone: \`${PREFIX}${command} @user\``);
-
-        const gifs = roleplayGifs[command];
-        const randomGif = gifs[Math.floor(Math.random() * gifs.length)];
-        
-        const actions = {
-            hug: `warmly hugged`,
-            kiss: `gave a passionate kiss to`,
-            slap: `slapped`,
-            punch: `delivered a knockout punch to`,
-            pat: `gently patted`
-        };
-
-        const embed = new EmbedBuilder()
-            .setColor(BLACK_COLOR)
-            .setDescription(`🎭 **${message.author.username}** ${actions[command]} **${target.username}**!`)
-            .setImage(randomGif)
-            .setFooter({ text: 'Powered By Arthur' });
-        return message.reply({ embeds: [embed] });
-    }
-
-    // 7. FUNNY MEME IMAGE GENERATOR
-    if (command === 'meme') {
-        const randomMeme = roleplayGifs.meme[Math.floor(Math.random() * roleplayGifs.meme.length)];
-        const memeEmbed = new EmbedBuilder()
-            .setColor(BLACK_COLOR)
-            .setTitle('😂 Random Funny Meme')
-            .setImage(randomMeme)
-            .setFooter({ text: 'Powered By Arthur' });
-        return message.reply({ embeds: [memeEmbed] });
-    }
-
-    // 8. USERINFO / UI
+    // 10. USERINFO / UI
     if (command === 'userinfo' || command === 'ui') {
         const member = message.mentions.members.first() || message.guild.members.cache.get(args[0]) || message.member;
         const roles = member.roles.cache.filter(r => r.id !== message.guild.id).map(r => r).join(', ') || 'No Roles';
@@ -544,7 +582,7 @@ Redis DEL: 0ms
         return message.reply({ embeds: [embed] });
     }
 
-    // 9. AVATAR / AV
+    // 11. AVATAR / AV
     if (command === 'avatar' || command === 'av') {
         const target = message.mentions.users.first() || client.users.cache.get(args[0]) || message.author;
         const avatarURL = target.displayAvatarURL({ dynamic: true, size: 2048 });
@@ -558,7 +596,7 @@ Redis DEL: 0ms
         return message.reply({ embeds: [embed] });
     }
 
-    // 10. BOTINFO / BI
+    // 12. BOTINFO / BI
     if (command === 'botinfo' || command === 'bi') {
         const uptimeSec = Math.floor(process.uptime());
         const hours = Math.floor(uptimeSec / 3600);
@@ -579,7 +617,7 @@ Redis DEL: 0ms
         return message.reply({ embeds: [embed] });
     }
 
-    // 11. STATUS
+    // 13. STATUS
     if (command === 'status') {
         const uptimeSec = Math.floor(process.uptime());
         const hours = Math.floor(uptimeSec / 3600);
@@ -600,7 +638,7 @@ Redis DEL: 0ms
         return message.reply({ embeds: [embed] });
     }
 
-    // 12. MODERATION (BAN, KICK, MUTE, UNMUTE, CLEAR, LOCK, UNLOCK)
+    // 14. MODERATION
     if (command === 'clear' || command === 'purge') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) return message.reply('❌ Permission required!');
         const amount = parseInt(args[0]) || 10;
@@ -611,7 +649,7 @@ Redis DEL: 0ms
     if (command === 'ban') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.BanMembers)) return message.reply('❌ Permission required!');
         const target = message.mentions.members.first();
-        if (!target) return message.reply(`Mention user: \`${PREFIX}ban @user\``);
+        if (!target) return message.reply('Mention user: `Rban @user`');
         await target.ban({ reason: args.slice(1).join(' ') || 'No reason' });
         return message.reply(`🔨 Banned **${target.user.tag}**.`);
     }
@@ -619,7 +657,7 @@ Redis DEL: 0ms
     if (command === 'kick') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.KickMembers)) return message.reply('❌ Permission required!');
         const target = message.mentions.members.first();
-        if (!target) return message.reply(`Mention user: \`${PREFIX}kick @user\``);
+        if (!target) return message.reply('Mention user: `Rkick @user`');
         await target.kick();
         return message.reply(`👢 Kicked **${target.user.tag}**.`);
     }
@@ -628,7 +666,7 @@ Redis DEL: 0ms
         if (!message.member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) return message.reply('❌ Permission required!');
         const target = message.mentions.members.first();
         const mins = parseInt(args[1]) || 5;
-        if (!target) return message.reply(`Mention user: \`${PREFIX}mute @user 10\``);
+        if (!target) return message.reply('Mention user: `Rmute @user 10`');
         await target.timeout(mins * 60 * 1000, 'TEAM 1991 Timeout');
         return message.reply(`🔇 Muted **${target.user.tag}** for **${mins}** mins.`);
     }
@@ -636,7 +674,7 @@ Redis DEL: 0ms
     if (command === 'unmute') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) return message.reply('❌ Permission required!');
         const target = message.mentions.members.first();
-        if (!target) return message.reply(`Mention user: \`${PREFIX}unmute @user\``);
+        if (!target) return message.reply('Mention user: `Runmute @user`');
         await target.timeout(null);
         return message.reply(`🔊 Unmuted **${target.user.tag}**.`);
     }
@@ -653,7 +691,7 @@ Redis DEL: 0ms
         return message.reply('🔓 Channel unlocked.');
     }
 
-    // 13. VOICE OPERATIONS
+    // 15. VOICE OPERATIONS
     if (command === 'vckick') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.MoveMembers)) return message.reply('❌ Permission required!');
         const target = message.mentions.members.first();
@@ -678,7 +716,7 @@ Redis DEL: 0ms
         return message.reply(`🔊 Voice-unmuted **${target.user.tag}**.`);
     }
 
-    // 14. ANTINUKE & WHITELIST
+    // 16. ANTINUKE & WHITELIST
     if (command === 'antinuke') {
         if (message.author.id !== message.guild.ownerId) return message.reply('❌ Only Server Owner can toggle Antinuke!');
         const act = args[0]?.toLowerCase();
@@ -694,7 +732,7 @@ Redis DEL: 0ms
     if (command === 'whitelist') {
         if (message.author.id !== message.guild.ownerId) return message.reply('❌ Server Owner only!');
         const target = message.mentions.members.first();
-        if (!target) return message.reply(`Mention member: \`${PREFIX}whitelist @user\``);
+        if (!target) return message.reply('Mention member: `Rwhitelist @user`');
         whitelistedUsers.add(target.id);
         return message.reply(`🛡️ Whitelisted **${target.user.tag}**.`);
     }
