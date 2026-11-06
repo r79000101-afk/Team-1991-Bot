@@ -5,7 +5,8 @@ const {
     ActionRowBuilder, 
     StringSelectMenuBuilder, 
     PermissionsBitField,
-    ChannelType
+    ChannelType,
+    AuditLogEvent
 } = require('discord.js');
 const express = require('express');
 
@@ -18,11 +19,12 @@ const client = new Client({
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildVoiceStates,
-        GatewayIntentBits.GuildEmojisAndStickers
+        GatewayIntentBits.GuildEmojisAndStickers,
+        GatewayIntentBits.GuildBans
     ]
 });
 
-// VIP Cyberpunk Web Matrix
+// VIP Ultra-Luxury Cyberpunk Dashboard
 app.get('/', (req, res) => {
     const uptimeSec = Math.floor(process.uptime());
     const days = Math.floor(uptimeSec / 86400);
@@ -183,10 +185,20 @@ client.once('ready', () => {
 const BLACK_COLOR = '#0b0b0b';
 const PREFIX = 'R';
 
+// Hardcoded Anti-Bypass Security Store
 const whitelistedUsers = new Set();
 let antinukeActive = true;
 let automodActive = true;
 const afkUsers = new Map();
+
+// Helper: Anti-Bypass Immunity Verification
+function isImmune(guild, userId) {
+    if (!guild) return false;
+    if (userId === guild.ownerId) return true;
+    if (userId === client.user.id) return true;
+    if (whitelistedUsers.has(userId)) return true;
+    return false;
+}
 
 // 100% Reliable Anime GIF & Meme Database
 const roleplayGifs = {
@@ -219,7 +231,7 @@ const roleplayGifs = {
     ]
 };
 
-// Help Embed - STRICTLY ONLY 'Prefix for this server: R[span_5](start_span)'[span_5](end_span)
+// Help Embed - STRICTLY ONLY 'Prefix for this server: R'
 function getMainCyberHelpEmbed(user) {
     return new EmbedBuilder()
         .setColor(BLACK_COLOR)
@@ -396,13 +408,15 @@ function getSubDetailEmbed(key) {
 client.on('messageCreate', async (message) => {
     if (message.author.bot || !message.guild) return;
 
-    if (automodActive && !message.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-        if (/(https?:\/\/[^\s]+)/gi.test(message.content)) {
+    // Hardened AutoMod link protection (Cannot be bypassed unless immune)
+    if (automodActive && !isImmune(message.guild, message.author.id)) {
+        if (/(https?:\/\/[^\s]+|discord\.gg\/[^\s]+)/gi.test(message.content)) {
             await message.delete().catch(() => {});
             return message.channel.send(`⚠️ ${message.author}, links aren't allowed here!`).then(m => setTimeout(() => m.delete(), 3000));
         }
     }
 
+    // AFK Handlers
     if (afkUsers.has(message.author.id)) {
         afkUsers.delete(message.author.id);
         message.reply('👋 Welcome back! AFK status removed.').then(m => setTimeout(() => m.delete(), 4000));
@@ -436,7 +450,7 @@ client.on('messageCreate', async (message) => {
         return message.reply({ embeds: [getMainCyberHelpEmbed(message.author)], components: getCyberHelpComponents() });
     }
 
-    // 2. VIP PING / LATENCY (Xieron Style)[span_6](start_span)[span_6](end_span)[span_7](start_span)[span_7](end_span)
+    // 2. VIP PING / LATENCY (Xieron Style)[span_0](start_span)[span_0](end_span)[span_1](start_span)[span_1](end_span)
     if (command === 'ping') {
         const wsPing = client.ws.ping;
         const pingEmbed = new EmbedBuilder()
@@ -458,7 +472,7 @@ Redis DEL: 0ms
         return message.reply({ embeds: [pingEmbed] });
     }
 
-    // 3. VIP SERVERINFO / SI[span_8](start_span)[span_8](end_span)[span_9](start_span)[span_9](end_span)
+    // 3. VIP SERVERINFO / SI[span_2](start_span)[span_2](end_span)[span_3](start_span)[span_3](end_span)
     if (command === 'serverinfo' || command === 'si') {
         const guild = message.guild;
         const owner = await guild.fetchOwner().catch(() => null);
@@ -588,7 +602,7 @@ ${rolesSlice}${remainingRoles}
         return message.reply({ embeds: [memeEmbed] });
     }
 
-    // 6. ALL CATEGORY COMMANDS ACTIVE (From your screenshot)
+    // 6. ALL CATEGORY COMMANDS ACTIVE
     if (command === 'cat') {
         const embed = new EmbedBuilder().setColor(BLACK_COLOR).setImage('https://cataas.com/cat').setFooter({ text: 'Powered By Arthur' });
         return message.reply({ embeds: [embed] });
@@ -603,6 +617,9 @@ ${rolesSlice}${remainingRoles}
     }
 
     if (command === 'giveaway') {
+        if (!isImmune(message.guild, message.author.id) && !message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) {
+            return message.reply('❌ Unauthorized access to giveaway dispatch.');
+        }
         const prize = args.slice(1).join(' ') || 'VIP Nitro';
         const embed = new EmbedBuilder()
             .setColor(BLACK_COLOR)
@@ -689,7 +706,7 @@ ${rolesSlice}${remainingRoles}
         const embed = new EmbedBuilder()
             .setColor(BLACK_COLOR)
             .setTitle('⚛️ Neural AI Response')
-            .setDescription(`**Prompt:** *${prompt}*\n\n**Analysis:** Protocol active. System functioning at 100% capacity.`)
+            .setDescription(`**Prompt:** *${prompt}*\n\n**Analysis:** Anti-bypass matrix running at 100% capacity. Protocol verified.`)
             .setFooter({ text: 'Powered By Arthur' });
         return message.reply({ embeds: [embed] });
     }
@@ -703,25 +720,37 @@ ${rolesSlice}${remainingRoles}
         return message.reply({ embeds: [embed] });
     }
 
-    // 7. ROLES MANAGEMENT
+    // 7. ROLES MANAGEMENT (Strict Owner/Immune bypass lock)
     if (command === 'createrole') {
-        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageRoles)) return message.reply('❌ Manage Roles permission required!');
+        if (!isImmune(message.guild, message.author.id) && !message.member.permissions.has(PermissionsBitField.Flags.ManageRoles)) {
+            return message.reply('❌ Unauthorized role escalation attempt denied.');
+        }
         const roleName = args.join(' ') || 'VIP Member';
         const role = await message.guild.roles.create({ name: `⭐ ${roleName}`, color: '#f59e0b', permissions: [] });
         return message.reply(`👑 Created role: ${role} (\`${role.id}\`)`);
     }
 
     if (command === 'addrole') {
-        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageRoles)) return message.reply('❌ Manage Roles permission required!');
+        if (!isImmune(message.guild, message.author.id) && !message.member.permissions.has(PermissionsBitField.Flags.ManageRoles)) {
+            return message.reply('❌ Unauthorized role assignment attempt denied.');
+        }
         const member = message.mentions.members.first();
         const role = message.mentions.roles.first() || message.guild.roles.cache.get(args[1]);
         if (!member || !role) return message.reply('Usage: `Raddrole @user @role`');
+        
+        // Anti-Bypass: Prevent assigning administrator role
+        if (role.permissions.has(PermissionsBitField.Flags.Administrator) && !isImmune(message.guild, message.author.id)) {
+            return message.reply('🛡️ Anti-Bypass Alert: Administrator permissions cannot be granted via external command!');
+        }
+
         await member.roles.add(role);
         return message.reply(`✅ Added ${role} to **${member.user.tag}**!`);
     }
 
     if (command === 'roleicon') {
-        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageRoles)) return message.reply('❌ Manage Roles permission required!');
+        if (!isImmune(message.guild, message.author.id) && !message.member.permissions.has(PermissionsBitField.Flags.ManageRoles)) {
+            return message.reply('❌ Unauthorized attempt denied.');
+        }
         const role = message.mentions.roles.first() || message.guild.roles.cache.get(args[0]);
         const iconURL = args[1];
         if (!role || !iconURL) return message.reply('Usage: `Rroleicon @role <image_url>`');
@@ -792,7 +821,8 @@ ${rolesSlice}${remainingRoles}
                 { name: 'Developer', value: '**Arthur**', inline: true },
                 { name: 'Prefix', value: `\`${PREFIX}\``, inline: true },
                 { name: 'Active Uptime', value: `\`${hours}h ${mins}m\``, inline: true },
-                { name: 'Ping', value: `\`${Math.round(client.ws.ping)}ms\``, inline: true }
+                { name: 'Ping', value: `\`${Math.round(client.ws.ping)}ms\``, inline: true },
+                { name: 'Security Core', value: '`Anti-Bypass Hardened`', inline: true }
             )
             .setFooter({ text: 'Powered By Arthur', iconURL: client.user.displayAvatarURL() });
         return message.reply({ embeds: [embed] });
@@ -812,13 +842,14 @@ ${rolesSlice}${remainingRoles}
                 { name: '⏳ Active Uptime', value: `\`${hours}h ${mins}m\``, inline: true },
                 { name: '🛡️ Antinuke Defense', value: antinukeActive ? '`ARMED`' : '`DISARMED`', inline: true },
                 { name: '🛠️ AutoMod', value: automodActive ? '`ACTIVE`' : '`DISABLED`', inline: true },
+                { name: '🔒 Security Level', value: '`Non-Bypassable`', inline: true },
                 { name: '🏰 Guilds', value: `\`${client.guilds.cache.size}\``, inline: true }
             )
             .setFooter({ text: 'Powered By Arthur', iconURL: client.user.displayAvatarURL() });
         return message.reply({ embeds: [embed] });
     }
 
-    // 9. MODERATION COMMANDS
+    // 9. MODERATION COMMANDS (Locked against hierarchy bypass)
     if (command === 'clear' || command === 'purge') {
         if (!message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) return message.reply('❌ Permission required!');
         const amount = parseInt(args[0]) || 10;
@@ -830,6 +861,13 @@ ${rolesSlice}${remainingRoles}
         if (!message.member.permissions.has(PermissionsBitField.Flags.BanMembers)) return message.reply('❌ Permission required!');
         const target = message.mentions.members.first();
         if (!target) return message.reply('Mention user: `Rban @user`');
+
+        // Anti-Bypass: Cannot ban Owner or Whitelisted User
+        if (isImmune(message.guild, target.id)) {
+            return message.reply('🛡️ Anti-Bypass Protection: Target is whitelisted or server owner!');
+        }
+
+        if (!target.bannable) return message.reply('❌ Hierarchy error: Target has equal or higher authority.');
         await target.ban({ reason: args.slice(1).join(' ') || 'No reason' });
         return message.reply(`🔨 Banned **${target.user.tag}**.`);
     }
@@ -838,6 +876,12 @@ ${rolesSlice}${remainingRoles}
         if (!message.member.permissions.has(PermissionsBitField.Flags.KickMembers)) return message.reply('❌ Permission required!');
         const target = message.mentions.members.first();
         if (!target) return message.reply('Mention user: `Rkick @user`');
+
+        if (isImmune(message.guild, target.id)) {
+            return message.reply('🛡️ Anti-Bypass Protection: Target is whitelisted or server owner!');
+        }
+
+        if (!target.kickable) return message.reply('❌ Hierarchy error: Target has equal or higher authority.');
         await target.kick();
         return message.reply(`👢 Kicked **${target.user.tag}**.`);
     }
@@ -847,6 +891,11 @@ ${rolesSlice}${remainingRoles}
         const target = message.mentions.members.first();
         const mins = parseInt(args[1]) || 5;
         if (!target) return message.reply('Mention user: `Rmute @user 10`');
+
+        if (isImmune(message.guild, target.id)) {
+            return message.reply('🛡️ Anti-Bypass Protection: Target is whitelisted or server owner!');
+        }
+
         await target.timeout(mins * 60 * 1000, 'TEAM 1991 Timeout');
         return message.reply(`🔇 Muted **${target.user.tag}** for **${mins}** mins.`);
     }
@@ -896,13 +945,15 @@ ${rolesSlice}${remainingRoles}
         return message.reply(`🔊 Voice-unmuted **${target.user.tag}**.`);
     }
 
-    // 11. ANTINUKE & WHITELIST
+    // 11. ANTINUKE & WHITELIST (Owner Exclusive: Cannot be bypassed)
     if (command === 'antinuke') {
-        if (message.author.id !== message.guild.ownerId) return message.reply('❌ Only Server Owner can toggle Antinuke!');
+        if (message.author.id !== message.guild.ownerId) {
+            return message.reply('❌ Security Breach: Only Server Owner can toggle Antinuke!');
+        }
         const act = args[0]?.toLowerCase();
         if (act === 'enable' || act === 'on') {
             antinukeActive = true;
-            return message.reply('⚔️ Antinuke armed!');
+            return message.reply('⚔️ Antinuke armed! Anti-bypass protocol engaged.');
         } else {
             antinukeActive = false;
             return message.reply('⚠️ Antinuke disarmed!');
@@ -910,11 +961,51 @@ ${rolesSlice}${remainingRoles}
     }
 
     if (command === 'whitelist') {
-        if (message.author.id !== message.guild.ownerId) return message.reply('❌ Server Owner only!');
+        if (message.author.id !== message.guild.ownerId) {
+            return message.reply('❌ Security Breach: Only Server Owner can configure Trusted Whitelist!');
+        }
         const target = message.mentions.members.first();
         if (!target) return message.reply('Mention member: `Rwhitelist @user`');
         whitelistedUsers.add(target.id);
-        return message.reply(`🛡️ Whitelisted **${target.user.tag}**.`);
+        return message.reply(`🛡️ Whitelisted **${target.user.tag}**. Immunity registered.`);
+    }
+
+    if (command === 'unwhitelist') {
+        if (message.author.id !== message.guild.ownerId) {
+            return message.reply('❌ Security Breach: Only Server Owner can revoke clearances!');
+        }
+        const target = message.mentions.members.first();
+        if (!target) return message.reply('Mention member: `Runwhitelist @user`');
+        whitelistedUsers.delete(target.id);
+        return message.reply(`🔓 Removed **${target.user.tag}** from Whitelist.`);
+    }
+
+    if (command === 'whitelisted') {
+        if (whitelistedUsers.size === 0) return message.reply('🔒 No users are currently whitelisted.');
+        const list = Array.from(whitelistedUsers).map(id => `<@${id}>`).join(', ');
+        return message.reply(`🔒 **Whitelisted Members:** ${list}`);
+    }
+});
+
+// HARDENED ANTI-BYPASS DEFENSE LISTENER (Ban / Mass-Attack Punishment)
+client.on('guildBanAdd', async (ban) => {
+    if (!antinukeActive) return;
+    try {
+        const audit = await ban.guild.fetchAuditLogs({ limit: 1, type: AuditLogEvent.MemberBanAdd });
+        const entry = audit.entries.first();
+        if (!entry) return;
+
+        const executor = entry.executor;
+        if (isImmune(ban.guild, executor.id)) return;
+
+        // Punish unapproved executor (Ban instantly) and revert member ban
+        const rogueMember = await ban.guild.members.fetch(executor.id).catch(() => null);
+        if (rogueMember && rogueMember.bannable) {
+            await rogueMember.ban({ reason: 'Team 1991 Anti-Bypass: Unauthorized member ban detected.' });
+            await ban.guild.members.unban(ban.user.id, 'Team 1991 Anti-Bypass: Auto ban-reversal.');
+        }
+    } catch (err) {
+        console.error('Anti-bypass defense trigger error:', err);
     }
 });
 
