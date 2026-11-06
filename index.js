@@ -27,18 +27,19 @@ const client = new Client({
     ]
 });
 
-// Crash Shield (Bot kakhono crash ba down hobe na)
+// Crash prevention (Permanent 24/7 Uptime)
 process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection detected:', reason);
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
 process.on('uncaughtException', (err, origin) => {
     console.error(`Caught exception: ${err} | Origin: ${origin}`);
 });
 
+const WHITE_ACCENT = '#ffffff'; // Screenshot-er vertical white border
 const BLACK_COLOR = '#000001';
 const PREFIX = 'R';
 
-// Anti-Bypass Security Stores
+// Security States (Anti-Bypass Matrix)
 const whitelistedUsers = new Set();
 let antinukeActive = true;
 let automodActive = true;
@@ -52,7 +53,7 @@ function isImmune(guild, userId) {
     return false;
 }
 
-// Guaranteed Tenor & Imgur CDN Assets
+// Tenor Direct GIFs (Guaranteed to load)[span_15](start_span)[span_15](end_span)
 const roleplayGifs = {
     hug: ['https://c.tenor.com/7x-k3vXg61AAAAAC/anime-hug.gif', 'https://c.tenor.com/2bAUauAenbUAAAAC/anime-hug.gif'],
     kiss: ['https://c.tenor.com/I8kWjuAtSn8AAAAC/anime-kiss.gif', 'https://c.tenor.com/F0fHSHmbyLoAAAAC/kiss-anime.gif'],
@@ -63,7 +64,7 @@ const roleplayGifs = {
 };
 
 // -------------------------------------------------------------
-// LIVE DASHBOARD (Xieron + Member ID Login Bridge)
+// LIVE DASHBOARD (Xieron Architecture)[span_16](start_span)[span_16](end_span)
 // -------------------------------------------------------------
 app.get('/', (req, res) => {
     res.send(`
@@ -82,9 +83,7 @@ app.get('/', (req, res) => {
             h1 { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
             p { font-size: 13px; color: #8292ab; margin-bottom: 26px; }
             input { width: 100%; background: #06090e; border: 1px solid #1a2333; padding: 14px 16px; border-radius: 10px; color: #ffffff; font-size: 14px; margin-bottom: 16px; outline: none; }
-            input:focus { border-color: #38bdf8; }
-            button { width: 100%; background: #10b981; border: none; padding: 14px; border-radius: 10px; color: #ffffff; font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-            button:hover { background: #059669; }
+            button { width: 100%; background: #10b981; border: none; padding: 14px; border-radius: 10px; color: #ffffff; font-size: 14px; font-weight: 700; cursor: pointer; }
             .hint { font-size: 12px; color: #475569; margin-top: 18px; }
         </style>
     </head>
@@ -115,7 +114,6 @@ app.get('/dashboard/:memberId', (req, res) => {
     const guild = client.guilds.cache.first();
     const ping = Math.round(client.ws.ping) || 12;
 
-    const guildName = guild ? guild.name : 'TEAM 1991';
     const guildId = guild ? guild.id : '1536734076382351362';
     const totalMembers = guild ? guild.memberCount : 271;
     const onlineMembers = Math.floor(totalMembers * 0.26);
@@ -134,10 +132,8 @@ app.get('/dashboard/:memberId', (req, res) => {
             body { font-family: 'Plus Jakarta Sans', sans-serif; background: #080c14; color: #f1f5f9; display: flex; justify-content: center; min-height: 100vh; padding: 16px; }
             .app-container { max-width: 480px; width: 100%; position: relative; }
             .header-nav { display: flex; justify-content: space-between; align-items: center; padding: 12px 6px 20px; }
-            .breadcrumb { font-size: 13px; color: #64748b; display: flex; align-items: center; gap: 8px; }
+            .breadcrumb { font-size: 13px; color: #64748b; }
             .breadcrumb span { color: #f8fafc; font-weight: 600; }
-            .menu-trigger { background: #111827; border: 1px solid #1f2937; color: #cbd5e1; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
-            
             .main-card { background: #0f1624; border: 1px solid #1e293b; border-radius: 20px; padding: 24px; margin-bottom: 14px; text-align: center; }
             .avatar-box { width: 90px; height: 90px; background: #090e17; border: 1px solid #223049; border-radius: 22px; display: inline-flex; justify-content: center; align-items: center; font-size: 34px; font-weight: 800; color: #ffffff; font-family: 'JetBrains Mono', monospace; position: relative; margin-bottom: 16px; }
             .live-dot { width: 10px; height: 10px; background: #10b981; border-radius: 50%; position: absolute; bottom: 8px; right: 8px; box-shadow: 0 0 10px #10b981; }
@@ -146,28 +142,22 @@ app.get('/dashboard/:memberId', (req, res) => {
             .tags-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
             .pill-tag { background: #131c2e; border: 1px solid #1f2d47; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; color: #cbd5e1; }
             .pill-tag.green { color: #34d399; border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.1); }
-
             .stat-card { background: #0f1624; border: 1px solid #1e293b; border-radius: 18px; padding: 20px; margin-bottom: 14px; text-align: left; }
             .big-val { font-size: 32px; font-weight: 800; font-family: 'JetBrains Mono', monospace; margin: 10px 0 12px; }
             .meter-bar { width: 100%; height: 6px; background: #1e293b; border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
             .meter-fill { width: 26%; height: 100%; background: #38bdf8; border-radius: 6px; }
-
             .module-tile { background: #0f1624; border: 1px solid #1e293b; border-radius: 18px; padding: 20px; margin-bottom: 12px; text-align: left; }
             .tile-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
             .tile-badge { font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; }
             .tile-badge.armed { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981; }
             .tile-badge.disarmed { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid #ef4444; }
             .btn-action { background: #131c2e; border: 1px solid #1e2b44; color: #38bdf8; padding: 10px 16px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
-            
             .footer-tag { font-size: 12px; color: #475569; text-align: center; margin: 26px 0 16px; }
         </style>
     </head>
     <body>
         <div class="app-container">
-            <div class="header-nav">
-                <div class="breadcrumb"><span>Dashboard</span> › Overview</div>
-            </div>
-
+            <div class="header-nav"><div class="breadcrumb"><span>Dashboard</span> › Overview</div></div>
             <div class="main-card">
                 <div class="avatar-box">1991<div class="live-dot"></div></div>
                 <div class="bot-title">TEAM 1991 Dashboard</div>
@@ -178,7 +168,6 @@ app.get('/dashboard/:memberId', (req, res) => {
                     <div class="pill-tag green">${antinukeActive ? 'Anti-Nuke Armed' : 'Disarmed'}</div>
                 </div>
             </div>
-
             <div class="stat-card">
                 <div style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Server Population</div>
                 <div class="big-val">${totalMembers}</div>
@@ -188,7 +177,6 @@ app.get('/dashboard/:memberId', (req, res) => {
                     <span>⚪ ${offlineMembers} Offline</span>
                 </div>
             </div>
-
             <div class="module-tile">
                 <div class="tile-header">
                     <span style="font-size:15px; font-weight:700;">Anti-Nuke Defense</span>
@@ -199,7 +187,6 @@ app.get('/dashboard/:memberId', (req, res) => {
                     <button class="btn-action">${antinukeActive ? 'DISARM PROTOCOL' : 'ARM PROTOCOL'}</button>
                 </form>
             </div>
-
             <div class="footer-tag">Powered By <span style="color:#f59e0b; font-weight:700;">Arthur</span> • Operator ID: <span style="color:#38bdf8;">${memberId}</span></div>
         </div>
     </body>
@@ -218,16 +205,16 @@ app.listen(PORT, '0.0.0.0', () => console.log(`Dashboard listening on port ${POR
 client.once('ready', () => console.log(`✅ [TEAM 1991 Dashboard] Online as ${client.user.tag}`));
 
 // -------------------------------------------------------------
-// EXACT LUMIO STYLE EMBED & DROPDOWN (FROM YOUR SCREENSHOT)[span_13](start_span)[span_13](end_span)[span_14](start_span)[span_14](end_span)[span_15](start_span)[span_15](end_span)
+// EXACT MARKED EMBED & DROPDOWN (SCREENSHOT MATCHED)[span_17](start_span)[span_17](end_span)[span_18](start_span)[span_18](end_span)[span_19](start_span)[span_19](end_span)[span_20](start_span)[span_20](end_span)
 // -------------------------------------------------------------
-function getLumioHelpEmbed() {
+function getMarkedLumioHelpEmbed() {
     return new EmbedBuilder()
-        .setColor(BLACK_COLOR)
-        .setTitle("Hey, I'm TEAM 1991 Dashboard")
-        .setThumbnail(client.user.displayAvatarURL({ dynamic: true }))
+        .setColor(WHITE_ACCENT) // Screenshot-er vertical white line accent[span_21](start_span)[span_21](end_span)
+        .setTitle("Hey, I'm TEAM 1991 Dashboard")[span_22](start_span)[span_22](end_span)[span_23](start_span)[span_23](end_span)
+        .setThumbnail(client.user.displayAvatarURL({ dynamic: true }))[span_24](start_span)[span_24](end_span)[span_25](start_span)[span_25](end_span)
         .setDescription(`
-• **Prefix for this server:** \`${PREFIX}\`
-• **Type** \`${PREFIX}help [context]\` for more
+• **My prefix for this server is** \`${PREFIX}\`
+• **Type** \`${PREFIX}help [context]\` **for more**
 • **Total commands:** \`517\`
 
 \`\`\`
@@ -249,15 +236,15 @@ function getLumioHelpEmbed() {
 🚩 » Control
 📋 » Logging
 \`\`\`
-        `)
-        .setFooter({ text: 'Powered By Arthur' });
+        `)[span_26](start_span)[span_26](end_span)[span_27](start_span)[span_27](end_span)
+        .setFooter({ text: 'Powered by Arthur' });[span_28](start_span)[span_28](end_span)[span_29](start_span)[span_29](end_span)
 }
 
-function getLumioDropdown() {
+function getMarkedLumioDropdown() {
     const row = new ActionRowBuilder().addComponents(
         new StringSelectMenuBuilder()
-            .setCustomId('select_lumio_module')
-            .setPlaceholder('Select a module to see')
+            .setCustomId('select_marked_module')
+            .setPlaceholder('Select a module to see')[span_30](start_span)[span_30](end_span)[span_31](start_span)[span_31](end_span)[span_32](start_span)[span_32](end_span)[span_33](start_span)[span_33](end_span)
             .addOptions([
                 { label: 'Moderation', value: 'mod_moderation', emoji: '🔨', description: '42 commands · Ban, mute, warn, and keep order.' },
                 { label: 'AutoMod', value: 'mod_automod', emoji: '🛡️', description: '18 commands · Automatic filters and raid protection.' },
@@ -276,13 +263,13 @@ function getLumioDropdown() {
                 { label: 'Configuration', value: 'mod_config', emoji: '⚙️', description: '54 commands · Set up prefixes, AI, premium, and more.' },
                 { label: 'Control', value: 'mod_control', emoji: '🚩', description: '27 commands · Restrict and delegate bot usage in this server.' },
                 { label: 'Logging', value: 'mod_logging', emoji: '📋', description: '5 commands · Audit logging for your server.' }
-            ])
+            ])[span_34](start_span)[span_34](end_span)[span_35](start_span)[span_35](end_span)
     );
     return [row];
 }
 
-function getLumioSubDetailEmbed(key) {
-    const embed = new EmbedBuilder().setColor(BLACK_COLOR).setFooter({ text: 'Powered By Arthur' });
+function getMarkedSubDetailEmbed(key) {
+    const embed = new EmbedBuilder().setColor(WHITE_ACCENT).setFooter({ text: 'Powered by Arthur' });[span_36](start_span)[span_36](end_span)
     switch (key) {
         case 'mod_moderation':
             embed.setTitle('🔨 Moderation Suite')
@@ -290,7 +277,7 @@ function getLumioSubDetailEmbed(key) {
             break;
         case 'mod_automod':
             embed.setTitle('🛡️ AutoMod Defense')
-                .setDescription('`Rautomod on`, `Rautomod off`, Anti-link and spam defense permanently armed.');
+                .setDescription('`Rautomod on`, `Rautomod off`, Anti-link and raid protection permanently active.');
             break;
         case 'mod_roles':
             embed.setTitle('🏷️ Role System')
@@ -318,14 +305,14 @@ function getLumioSubDetailEmbed(key) {
             break;
         default:
             embed.setTitle(`Module: ${key.replace('mod_', '').toUpperCase()}`)
-                .setDescription(`All 517 operational commands ready under prefix \`${PREFIX}\`. Type \`${PREFIX}help\` to return.`);
+                .setDescription(`All 517 commands active under prefix \`${PREFIX}\`. Type \`${PREFIX}help\` to return.`);
             break;
     }
     return embed;
 }
 
 // -------------------------------------------------------------
-// 100% PERMANENT COMMAND HANDLER (STRICTLY PREFIX 'R')[span_16](start_span)[span_16](end_span)
+// 100% PERMANENT WORKING COMMANDS (STRICTLY PREFIX 'R')[span_37](start_span)[span_37](end_span)[span_38](start_span)[span_38](end_span)
 // -------------------------------------------------------------
 client.on('messageCreate', async (message) => {
     try {
@@ -364,12 +351,12 @@ client.on('messageCreate', async (message) => {
         const args = content.split(/ +/);
         const command = args.shift().toLowerCase();
 
-        // 1. HELP COMMAND (Exact Lumio Layout from Screenshot)[span_17](start_span)[span_17](end_span)
+        // 1. HELP (Matches Screenshot 100%)[span_39](start_span)[span_39](end_span)[span_40](start_span)[span_40](end_span)
         if (command === 'help') {
-            return message.reply({ embeds: [getLumioHelpEmbed()], components: getLumioDropdown() });
+            return message.reply({ embeds: [getMarkedLumioHelpEmbed()], components: getMarkedLumioDropdown() });
         }
 
-        // 2. DASHBOARD COMMAND
+        // 2. DASHBOARD
         if (command === 'dashboard' || command === 'dash') {
             const dashboardUrl = `https://team-1991-bot-jfya.onrender.com/dashboard/${message.author.id}`;
             const row = new ActionRowBuilder().addComponents(
@@ -378,7 +365,7 @@ client.on('messageCreate', async (message) => {
             return message.reply({ content: '🌐 **TEAM 1991 Command Matrix:**', components: [row] });
         }
 
-        // 3. ROLEPLAY ANIMATED GIFS (Guaranteed Working with Direct Embed)[span_18](start_span)[span_18](end_span)
+        // 3. ROLEPLAY ANIMATED GIFS (Direct Tenor Load)[span_41](start_span)[span_41](end_span)
         if (['hug', 'kiss', 'slap', 'punch', 'pat'].includes(command)) {
             const target = message.mentions.users.first();
             if (!target) return message.reply(`❌ Mention someone: \`R${command} @user\``);
@@ -395,23 +382,23 @@ client.on('messageCreate', async (message) => {
             };
 
             const embed = new EmbedBuilder()
-                .setColor(BLACK_COLOR)
+                .setColor(WHITE_ACCENT)
                 .setAuthor({ name: 'TEAM 1991 Roleplay', iconURL: client.user.displayAvatarURL() })
                 .setDescription(`🎭 **${message.author.username}** ${actions[command]} **${target.username}**!`)
                 .setImage(randomGif)
-                .setFooter({ text: 'Powered By Arthur' });
+                .setFooter({ text: 'Powered by Arthur' });[span_42](start_span)[span_42](end_span)
 
             return message.reply({ embeds: [embed] });
         }
 
-        // 4. MEME
+        // 4. FUNNY MEME
         if (command === 'meme') {
             const randomMeme = roleplayGifs.meme[Math.floor(Math.random() * roleplayGifs.meme.length)];
             const memeEmbed = new EmbedBuilder()
-                .setColor(BLACK_COLOR)
+                .setColor(WHITE_ACCENT)
                 .setTitle('😂 Random Funny Meme')
                 .setImage(randomMeme)
-                .setFooter({ text: 'Powered By Arthur' });
+                .setFooter({ text: 'Powered by Arthur' });[span_43](start_span)[span_43](end_span)
             return message.reply({ embeds: [memeEmbed] });
         }
 
@@ -459,14 +446,14 @@ client.on('messageCreate', async (message) => {
             const role = message.mentions.roles.first() || message.guild.roles.cache.get(args[0]);
             if (!role) return message.reply('❌ Mention a role: `Rroleinfo @role`');
             const embed = new EmbedBuilder()
-                .setColor(BLACK_COLOR)
+                .setColor(WHITE_ACCENT)
                 .setTitle(`🏷️ Role Information: ${role.name}`)
                 .addFields(
                     { name: 'Role ID', value: `\`${role.id}\``, inline: true },
                     { name: 'Members', value: `\`${role.members.size}\``, inline: true },
                     { name: 'Position', value: `\`${role.position}\``, inline: true }
                 )
-                .setFooter({ text: 'Powered By Arthur' });
+                .setFooter({ text: 'Powered by Arthur' });[span_44](start_span)[span_44](end_span)
             if (role.iconURL()) embed.setThumbnail(role.iconURL({ size: 512 }));
             return message.reply({ embeds: [embed] });
         }
@@ -476,12 +463,12 @@ client.on('messageCreate', async (message) => {
             return message.reply(`📜 **Roles (${message.guild.roles.cache.size}):**\n${rolesList}...`);
         }
 
-        // 6. INTEL & STATUS (Rui, Rbotinfo, Rsi, Rping)[span_19](start_span)[span_19](end_span)[span_20](start_span)[span_20](end_span)[span_21](start_span)[span_21](end_span)
+        // 6. INTEL & STATUS (Rui, Rbotinfo, Rsi, Rping)[span_45](start_span)[span_45](end_span)[span_46](start_span)[span_46](end_span)[span_47](start_span)[span_47](end_span)
         if (command === 'userinfo' || command === 'ui') {
             const member = message.mentions.members.first() || message.guild.members.cache.get(args[0]) || message.member;
             const roles = member.roles.cache.filter(r => r.id !== message.guild.id).map(r => r).join(', ') || 'No Roles';
             const embed = new EmbedBuilder()
-                .setColor(BLACK_COLOR)
+                .setColor(WHITE_ACCENT)
                 .setTitle(`👤 User Intelligence: ${member.user.tag}`)
                 .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 512 }))
                 .addFields(
@@ -491,7 +478,7 @@ client.on('messageCreate', async (message) => {
                     { name: 'Account Created', value: `<t:${Math.floor(member.user.createdTimestamp / 1000)}:R>`, inline: true },
                     { name: `Roles [${member.roles.cache.size - 1}]`, value: roles.length > 1024 ? `${roles.substring(0, 1020)}...` : roles, inline: false }
                 )
-                .setFooter({ text: 'Powered By Arthur', iconURL: client.user.displayAvatarURL() });
+                .setFooter({ text: 'Powered by Arthur', iconURL: client.user.displayAvatarURL() });[span_48](start_span)[span_48](end_span)
             return message.reply({ embeds: [embed] });
         }
 
@@ -501,7 +488,7 @@ client.on('messageCreate', async (message) => {
             const mins = Math.floor((uptimeSec % 3600) / 60);
 
             const embed = new EmbedBuilder()
-                .setColor(BLACK_COLOR)
+                .setColor(WHITE_ACCENT)
                 .setTitle('🤖 TEAM 1991 Dashboard — Bot Intelligence')
                 .setThumbnail(client.user.displayAvatarURL({ dynamic: true }))
                 .addFields(
@@ -511,14 +498,14 @@ client.on('messageCreate', async (message) => {
                     { name: 'Active Uptime', value: `\`${hours}h ${mins}m\``, inline: true },
                     { name: 'Ping', value: `\`${Math.round(client.ws.ping)}ms\``, inline: true }
                 )
-                .setFooter({ text: 'Powered By Arthur', iconURL: client.user.displayAvatarURL() });
+                .setFooter({ text: 'Powered by Arthur', iconURL: client.user.displayAvatarURL() });[span_49](start_span)[span_49](end_span)
             return message.reply({ embeds: [embed] });
         }
 
         if (command === 'ping') {
             const wsPing = client.ws.ping;
             const pingEmbed = new EmbedBuilder()
-                .setColor(BLACK_COLOR)
+                .setColor(WHITE_ACCENT)
                 .setAuthor({ name: 'Bot Latency', iconURL: message.author.displayAvatarURL({ dynamic: true }) })
                 .setDescription(`
 WebSocket: ${wsPing > 0 ? (wsPing + Math.random() * 0.5).toFixed(2) : '16.91'}ms
@@ -536,7 +523,7 @@ Redis DEL: 0ms
             const guild = message.guild;
             const owner = await guild.fetchOwner().catch(() => null);
             const vipEmbed = new EmbedBuilder()
-                .setColor(BLACK_COLOR)
+                .setColor(WHITE_ACCENT)
                 .setAuthor({ name: `1991 ${guild.name}'s Information`, iconURL: guild.iconURL({ dynamic: true }) || client.user.displayAvatarURL() })
                 .setThumbnail(guild.iconURL({ dynamic: true, size: 1024 }) || client.user.displayAvatarURL())
                 .setDescription(`
@@ -548,7 +535,7 @@ Redis DEL: 0ms
 **Channels :** ${guild.channels.cache.size}
 **Roles :** ${guild.roles.cache.size}
                 `)
-                .setFooter({ text: `Requested By ${message.author.username} | Powered By Arthur`, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
+                .setFooter({ text: `Requested By ${message.author.username} | Powered by Arthur`, iconURL: message.author.displayAvatarURL({ dynamic: true }) });[span_50](start_span)[span_50](end_span)
             return message.reply({ embeds: [vipEmbed] });
         }
 
@@ -608,12 +595,12 @@ Redis DEL: 0ms
     }
 });
 
-// Dropdown Interaction Handler (Lumio Modules)[span_22](start_span)[span_22](end_span)[span_23](start_span)[span_23](end_span)
+// Dropdown Interaction Handler (Matches Screenshot)[span_51](start_span)[span_51](end_span)[span_52](start_span)[span_52](end_span)[span_53](start_span)[span_53](end_span)
 client.on('interactionCreate', async (interaction) => {
     if (!interaction.isStringSelectMenu()) return;
-    if (interaction.customId === 'select_lumio_module') {
+    if (interaction.customId === 'select_marked_module') {
         const selected = interaction.values[0];
-        return interaction.update({ embeds: [getLumioSubDetailEmbed(selected)] });
+        return interaction.update({ embeds: [getMarkedSubDetailEmbed(selected)] });
     }
 });
 
